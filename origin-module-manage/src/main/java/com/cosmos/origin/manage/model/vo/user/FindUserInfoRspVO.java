@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @Schema(name = "获取当前登录用户信息响应参数")
 public class FindUserInfoRspVO {
 
+    @Schema(description = "用户名")
+    private String username;
+
     @Schema(description = "昵称")
     private String nickname;
 

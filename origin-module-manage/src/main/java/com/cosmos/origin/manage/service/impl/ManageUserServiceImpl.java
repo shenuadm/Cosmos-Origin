@@ -62,6 +62,7 @@ public class ManageUserServiceImpl implements ManageUserService {
         UserDO userDO = userMapper.findByUsername(username);
 
         return Response.success(FindUserInfoRspVO.builder()
+                .username(username)
                 .nickname(userDO.getNickname())
                 .avatar(userDO.getAvatar())
                 .phone(userDO.getPhone())
