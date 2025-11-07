@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: "技术底座单体版"
+  profiles:
+    # 默认激活的环境
+    active: dev
+  security:
+    user:
+      name: admin # 登录用户名
+      password: 123456 # 登录密码
+
+jwt:
+  # 签发人
+  issuer: "一陌千尘"
+  # 秘钥
+  secret: HpOdsqmwOqtJcq3AzargcLbYKTp7qijmrPv4Mx9rLbGcS2mB0USGdmsPYJXso9zTVzWA/Tmrh/iW1irD8nYYTQ==
+  # token 过期时间（单位：分钟） 24*60
+  tokenExpireTime: 1440
+  # token 请求头中的 key 值
+  tokenHeaderKey: Authorization
+  # token 请求头中的 value 值前缀
+  tokenPrefix: Bearer
+
+# springdoc-openapi 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan:
+        # 指定扫描的包
+        - com.cosmos.origin.web.controller
+        - com.cosmos.origin.manage.controller
+# knife4j 增强配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
