@@ -48,7 +48,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorize -> { // 处理请求
                     // 放开哪些接口
                     authorize.requestMatchers("/login", "/logout", "/test").permitAll(); // 登录接口，登出接口，测试接口
-                    authorize.requestMatchers("/doc.html", "/v3/api-docs/**", "/favicon.ico").permitAll(); // knife4j 接口文档
+                    authorize.requestMatchers("/doc.html", "/v3/api-docs/**", "/favicon.ico", "/webjars/**", "/.well-known/**").permitAll(); // knife4j 接口文档
                     // 用户管理相关接口
                     authorize.requestMatchers("/manage/user/**").hasAuthority(RoleTypeEnum.SYSTEM_ADMIN.getRoleKey());
                     // 角色管理相关接口

@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/manage")
@@ -22,7 +19,7 @@ public class ManageUserController {
 
     private final ManageUserService userService;
 
-    @PostMapping("/password/update")
+    @PutMapping("/password/update")
     @Operation(summary = "修改用户密码")
     @ApiOperationLog(description = "修改用户密码")
     public Response<?> updatePassword(@RequestBody @Validated UpdateAdminUserPasswordReqVO updateAdminUserPasswordReqVO) {
@@ -50,14 +47,14 @@ public class ManageUserController {
         return userService.addUser(addUserReqVO);
     }
 
-    @PostMapping("/user/update")
+    @PutMapping("/user/update")
     @Operation(summary = "更新用户")
     @ApiOperationLog(description = "更新用户")
     public Response<?> updateUser(@RequestBody @Validated UpdateUserReqVO updateUserReqVO) {
         return userService.updateUser(updateUserReqVO);
     }
 
-    @PostMapping("/user/delete")
+    @DeleteMapping("/user/delete")
     @Operation(summary = "删除用户")
     @ApiOperationLog(description = "删除用户")
     public Response<?> deleteUser(@RequestBody @Validated DeleteUserReqVO deleteUserReqVO) {

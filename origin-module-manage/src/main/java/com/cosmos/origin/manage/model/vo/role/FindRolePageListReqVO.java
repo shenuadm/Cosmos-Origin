@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Schema(name = "查询角色分页数据请求参数")
 public class FindRolePageListReqVO extends BasePageQuery {
 
-    @Schema(name = "角色名称")
+    @Schema(description = "角色名称")
     private String roleName;
 }

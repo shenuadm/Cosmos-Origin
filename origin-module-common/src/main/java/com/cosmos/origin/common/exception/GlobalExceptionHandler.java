@@ -4,7 +4,6 @@ import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.utils.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -83,21 +82,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({NoResourceFoundException.class})
     @ResponseBody
     public Response<Object> handleNoResourceFoundException(HttpServletRequest request, NoResourceFoundException e) {
-        log.warn("{} request error, ", request.getRequestURI(), e);
+        // log.warn("{} request error, ", request.getRequestURI(), e);
         return Response.fail(ResponseCodeEnum.NOT_FOUND);
-    }
-
-    /**
-     * 捕获权限不足异常
-     *
-     * @param e 权限不足异常
-     * @throws AccessDeniedException 权限不足异常
-     */
-    @ExceptionHandler({AccessDeniedException.class})
-    public void throwAccessDeniedException(AccessDeniedException e) throws AccessDeniedException {
-        // 捕获到鉴权失败异常，主动抛出，交给 RestAccessDeniedHandler 去处理
-        log.info("============= 捕获到 AccessDeniedException");
-        throw e;
     }
 
     /**

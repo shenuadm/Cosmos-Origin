@@ -1,32 +1,26 @@
 package com.cosmos.origin.common.utils;
 
 import com.mybatisflex.core.paginate.Page;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 import java.util.Objects;
 
+@Schema(name = "分页响应参数工具类")
 @Data
 public class PageResponse<T> extends Response<List<T>> {
 
-    /**
-     * 总记录数
-     */
+    @Schema(description = "总记录数，默认为 0")
     private long total = 0L;
 
-    /**
-     * 每页显示的记录数，默认每页显示 10 条
-     */
+    @Schema(description = "每页显示的记录数，默认每页显示 10 条")
     private long size = 10L;
 
-    /**
-     * 当前页码
-     */
+    @Schema(description = "当前页码，默认为 1")
     private long current = 1L;
 
-    /**
-     * 总页数
-     */
+    @Schema(description = "总页数")
     private long pages;
 
     /**
