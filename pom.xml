@@ -43,14 +43,14 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <!-- 依赖包版本 -->
-        <lombok.version>1.18.30</lombok.version>
-        <guava.version>32.1.2-jre</guava.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <lombok.version>1.18.42</lombok.version>
+        <guava.version>33.5.0-jre</guava.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
         <knife4j.version>4.5.0</knife4j.version>
-        <jackson.version>2.15.2</jackson.version>
-        <mybatis-flex.version>1.10.9</mybatis-flex.version>
-        <hikari.version>5.1.0</hikari.version>
-        <postgresql.version>42.7.3</postgresql.version>
+        <jackson.version>2.20.1</jackson.version>
+        <mybatis-flex.version>1.11.5</mybatis-flex.version>
+        <hikari.version>7.0.2</hikari.version>
+        <postgresql.version>42.7.8</postgresql.version>
         <jjwt.version>0.11.2</jjwt.version>
     </properties>
 
