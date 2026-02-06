@@ -2,6 +2,7 @@ package com.cosmos.origin.web.config;
 
 import com.cosmos.origin.admin.enums.RoleTypeEnum;
 import com.cosmos.origin.jwt.config.JwtAuthenticationSecurityConfig;
+import com.cosmos.origin.jwt.filter.RateLimitFilter;
 import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationEntryPoint;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -33,18 +35,26 @@ public class WebSecurityConfig {
     private final JwtAuthenticationSecurityConfig jwtAuthenticationSecurityConfig;
     private final RestAuthenticationEntryPoint authEntryPoint;
     private final RestAccessDeniedHandler deniedHandler;
+    private final UserDetailsService userDetailsService;
 
     /**
      * 核心配置
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable) // 禁用 csrf
-                .formLogin(AbstractHttpConfigurer::disable) // 禁用表单登录
+        http.csrf(AbstractHttpConfigurer::disable) // 禁用 csrf，防止跨站请求伪造攻击
+                .formLogin(AbstractHttpConfigurer::disable) // 禁用 Spring Security 的默认表单登录页面
                 // 设置用户登录认证相关配置
                 .with(jwtAuthenticationSecurityConfig, customizer -> {
                     // 这里可以添加自定义配置（如果需要）
                 })
+                // 配置记住我功能
+                .rememberMe(remember -> remember
+                        .key("uniqueAndSecretKey")               // 加密密钥
+                        .tokenValiditySeconds(7 * 24 * 60 * 60)  // 7天有效期
+                        .userDetailsService(userDetailsService)  // 用户服务
+                        .rememberMeParameter("rememberMe")       // 表单参数名
+                )
                 .authorizeHttpRequests(authorize -> { // 处理请求
                     // 放开哪些接口
                     authorize.requestMatchers("/login", "/logout", "/test").permitAll(); // 登录接口，登出接口，测试接口
@@ -63,7 +73,9 @@ public class WebSecurityConfig {
                 })
                 // 前后端分离，无需创建会话
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-                // 将 Token 校验过滤器添加到用户认证过滤器之前，如果使用token这个配置是必须的
+                // 在 Token 过滤器之前添加限流过滤器
+                // .addFilterBefore(new RateLimitFilter(), TokenAuthenticationFilter.class)
+                // 将 Token 校验过滤器添加到用户认证过滤器之前，如果使用 token 这个配置是必须的
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

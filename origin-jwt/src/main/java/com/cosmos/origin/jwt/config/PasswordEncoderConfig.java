@@ -22,7 +22,7 @@ public class PasswordEncoderConfig {
         return new BCryptPasswordEncoder();
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         log.info("密码：{}", encoder.encode("123456"));
     }

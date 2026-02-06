@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * 实体基类
+ * <p>
  * 定义通用的实体字段，所有业务实体应继承此类
  *
  * @author 一陌千尘

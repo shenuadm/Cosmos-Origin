@@ -2,6 +2,7 @@ package com.cosmos.origin.jwt.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +59,7 @@ public class JwtTokenHelper implements InitializingBean {
         return Base64.getEncoder().encodeToString(secretKey.getEncoded());
     }
 
-    public static void main(String[] args) {
+    static void main() {
         String key = generateBase64Key();
         log.info("key: {}", key);
     }
@@ -124,7 +125,6 @@ public class JwtTokenHelper implements InitializingBean {
      * 校验 Token 是否可用
      *
      * @param token Token
-     * @return 校验结果
      */
     public void validateToken(String token) {
         jwtParser.parseClaimsJws(token);
@@ -139,10 +139,9 @@ public class JwtTokenHelper implements InitializingBean {
     public String getUsernameByToken(String token) {
         try {
             Claims claims = jwtParser.parseClaimsJws(token).getBody();
-            String username = claims.getSubject();
-            return username;
+            return claims.getSubject();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Token 解析异常: ", e);
         }
         return null;
     }

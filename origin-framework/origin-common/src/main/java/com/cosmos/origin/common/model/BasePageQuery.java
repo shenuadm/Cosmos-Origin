@@ -3,6 +3,12 @@ package com.cosmos.origin.common.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+/**
+ * 分页查询参数，继承该类即可
+ *
+ * @author 一陌千尘
+ * @date 2026/02/06
+ */
 @Data
 public class BasePageQuery {
 

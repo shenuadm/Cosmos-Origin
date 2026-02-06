@@ -6,8 +6,8 @@ import com.cosmos.origin.jwt.utils.JwtTokenHelper;
 import com.cosmos.origin.jwt.utils.ResultUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +22,12 @@ import java.io.IOException;
  * @author 一陌千尘
  * @date 2025/07/14
  */
+@RequiredArgsConstructor
 @Component
 @Slf4j
 public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired
-    private JwtTokenHelper jwtTokenHelper;
+    private final JwtTokenHelper jwtTokenHelper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {

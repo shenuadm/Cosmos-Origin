@@ -7,10 +7,6 @@ spring:
   profiles:
     # 默认激活的环境
     active: dev
-  security:
-    user:
-      name: admin # 登录用户名
-      password: 123456 # 登录密码
 
 jwt:
   # 签发人

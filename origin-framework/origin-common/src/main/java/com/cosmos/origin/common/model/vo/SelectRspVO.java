@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class SelectRspVO {
+
     /**
      * Select 下拉列表的展示文字
      */

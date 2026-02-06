@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,7 +47,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private String tokenHeaderKey;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if ("/login".equals(request.getRequestURI()) && "POST".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
@@ -55,7 +56,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader(tokenHeaderKey);
 
         // 判断 value 值是否以 Bearer 开头
-        if (StringUtils.startsWith(header, tokenPrefix)) {
+        if (header != null && header.startsWith(tokenPrefix)) {
             // 截取 Token 令牌
             String token = StringUtils.substring(header, 7);
             log.info("Token: {}", token);

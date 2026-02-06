@@ -4,7 +4,6 @@ import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.utils.Response;
 import com.cosmos.origin.jwt.exception.UsernameOrPasswordNullException;
 import com.cosmos.origin.jwt.utils.ResultUtil;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +23,9 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class RestAuthenticationFailureHandler implements AuthenticationFailureHandler {
+
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         log.warn("AuthenticationException: ", exception);
         if (exception instanceof UsernameOrPasswordNullException) {
             // 用户名或密码为空

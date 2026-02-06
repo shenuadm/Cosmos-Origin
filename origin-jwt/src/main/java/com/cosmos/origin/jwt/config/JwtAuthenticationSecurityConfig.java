@@ -3,7 +3,7 @@ package com.cosmos.origin.jwt.config;
 import com.cosmos.origin.jwt.filter.JwtAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAuthenticationFailureHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationSuccessHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,17 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author 一陌千尘
  * @date 2025/11/04
  */
+@RequiredArgsConstructor
 @Configuration
 public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-    @Autowired
-    private RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
-    @Autowired
-    private RestAuthenticationFailureHandler restAuthenticationFailureHandler;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
+    private final RestAuthenticationFailureHandler restAuthenticationFailureHandler;
+    private final PasswordEncoder passwordEncoder;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public void configure(HttpSecurity httpSecurity) {
@@ -43,10 +40,7 @@ public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<D
         filter.setAuthenticationFailureHandler(restAuthenticationFailureHandler);
 
         // 直接使用 DaoAuthenticationProvider, 它是 Spring Security 提供的默认的身份验证提供者之一
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        // 设置 userDetailService，用于获取用户的详细信息
-        provider.setUserDetailsService(userDetailsService);
-        // 设置加密算法
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         httpSecurity.authenticationProvider(provider);
         // 将这个过滤器添加到 UsernamePasswordAuthenticationFilter 之前执行

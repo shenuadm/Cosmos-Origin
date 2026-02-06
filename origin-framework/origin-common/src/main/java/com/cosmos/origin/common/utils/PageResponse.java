@@ -3,10 +3,12 @@ package com.cosmos.origin.common.utils;
 import com.mybatisflex.core.paginate.Page;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.Objects;
 
+@EqualsAndHashCode(callSuper = true)
 @Schema(name = "分页响应参数工具类")
 @Data
 public class PageResponse<T> extends Response<List<T>> {
