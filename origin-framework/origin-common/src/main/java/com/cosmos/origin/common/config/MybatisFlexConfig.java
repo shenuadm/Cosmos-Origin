@@ -25,7 +25,7 @@ public class MybatisFlexConfig {
 
         // 设置 SQL 审计收集器
         AuditManager.setMessageCollector(auditMessage ->
-                logger.info("{},{}ms", auditMessage.getFullSql()
+                logger.info("SQL语句：{}, 执行耗时：{}ms", auditMessage.getFullSql()
                         , auditMessage.getElapsedTime())
         );
     }
