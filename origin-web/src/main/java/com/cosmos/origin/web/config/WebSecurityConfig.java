@@ -1,6 +1,6 @@
-package com.cosmos.origin.admin.config;
+package com.cosmos.origin.web.config;
 
-import com.cosmos.origin.common.enums.RoleTypeEnum;
+import com.cosmos.origin.admin.enums.RoleTypeEnum;
 import com.cosmos.origin.jwt.config.JwtAuthenticationSecurityConfig;
 import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;

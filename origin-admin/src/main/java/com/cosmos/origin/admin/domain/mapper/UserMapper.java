@@ -1,11 +1,17 @@
-package com.cosmos.origin.common.domain.mapper;
+package com.cosmos.origin.admin.domain.mapper;
 
-import com.cosmos.origin.common.domain.dos.UserDO;
+import com.cosmos.origin.admin.domain.entity.UserDO;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.query.QueryWrapper;
 
 import java.util.Objects;
 
+/**
+ * 用户Mapper
+ *
+ * @author 一陌千尘
+ * @date 2025/11/03
+ */
 public interface UserMapper extends BaseMapper<UserDO> {
 
     /**

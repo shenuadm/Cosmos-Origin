@@ -24,7 +24,7 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     UNAUTHORIZED("20002", "无访问权限，请先登录！"),
     USERNAME_NOT_FOUND("20003", "该用户不存在"),
     FORBIDDEN("20004", "权限不足！"),
-    NOT_FOUND("20005", " 404 Not Found"),
+    NOT_FOUND("20005", "请求路径不存在，请检查路径是否正确！"),
     USER_NOT_ROLE("20006", " 用户未分配角色"),
     ;
 

@@ -1,8 +1,14 @@
-package com.cosmos.origin.common.enums;
+package com.cosmos.origin.admin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * 角色类型枚举
+ *
+ * @author 一陌千尘
+ * @date 2025/11/05
+ */
 @Getter
 @AllArgsConstructor
 public enum RoleTypeEnum {

@@ -15,6 +15,12 @@ public class JsonUtil {
 
     private static final ObjectMapper INSTANCE = new ObjectMapper();
 
+    /**
+     * 对象转为 JSON 字符串
+     *
+     * @param obj 对象
+     * @return {@link String } JSON 字符串
+     */
     public static String toJsonString(Object obj) {
         try {
             return INSTANCE.writeValueAsString(obj);

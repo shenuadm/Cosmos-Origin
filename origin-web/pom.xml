@@ -24,6 +24,11 @@
             <artifactId>origin-admin</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.cosmos</groupId>
+            <artifactId>origin-jwt</artifactId>
+        </dependency>
+
         <!-- Log4j2 日志 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

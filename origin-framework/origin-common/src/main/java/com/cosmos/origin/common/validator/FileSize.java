@@ -28,7 +28,7 @@ public @interface FileSize {
     /**
      * 最大文件大小（字节）
      */
-    long maxSize() default 10 * 1024 * 1024; // 默认10MB
+    long maxSize() default 10 * 1024 * 1024; // 默认 10MB
 
     /**
      * 最小文件大小（字节）

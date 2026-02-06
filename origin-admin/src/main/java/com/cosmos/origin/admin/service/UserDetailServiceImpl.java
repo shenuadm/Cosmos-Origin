@@ -1,10 +1,10 @@
-package com.cosmos.origin.jwt.service;
+package com.cosmos.origin.admin.service;
 
-import com.cosmos.origin.common.domain.dos.RoleDO;
-import com.cosmos.origin.common.domain.dos.UserDO;
-import com.cosmos.origin.common.domain.dos.UserRoleRelDO;
-import com.cosmos.origin.common.domain.mapper.RoleMapper;
-import com.cosmos.origin.common.domain.mapper.UserMapper;
+import com.cosmos.origin.admin.domain.entity.RoleDO;
+import com.cosmos.origin.admin.domain.entity.UserDO;
+import com.cosmos.origin.admin.domain.entity.UserRoleRelDO;
+import com.cosmos.origin.admin.domain.mapper.RoleMapper;
+import com.cosmos.origin.admin.domain.mapper.UserMapper;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.exception.BizException;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -22,6 +22,8 @@ import java.util.Objects;
 
 /**
  * 用户详情服务实现类
+ * <p>
+ * 负责从数据库加载用户信息和角色，供Spring Security使用
  *
  * @author 一陌千尘
  * @date 2025/11/04
@@ -46,7 +48,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         // 查询用户角色
         List<RoleDO> roleDOS = roleMapper.selectListByQuery(QueryWrapper.create()
-                .select("role_key")
+                .select(RoleDO::getRoleKey)
                 .from(RoleDO.class).as("tr")
                 .innerJoin(UserRoleRelDO.class).as("tur")
                 .on("tr.id = tur.role_id")

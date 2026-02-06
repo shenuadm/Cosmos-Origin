@@ -1,15 +1,14 @@
-package com.cosmos.origin.common.domain.dos;
+package com.cosmos.origin.admin.domain.entity;
 
-import com.mybatisflex.annotation.Column;
+import com.cosmos.origin.common.model.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * 用户DO
@@ -18,11 +17,12 @@ import java.time.LocalDateTime;
  * @date 2025/11/03
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table("t_user")
-public class UserDO {
+public class UserDO extends BaseEntity {
 
     @Id(keyType = KeyType.Auto)
     private Long id;
@@ -38,11 +38,4 @@ public class UserDO {
     private String phone;
 
     private String email;
-
-    @Column(onInsertValue = "CURRENT_TIMESTAMP")
-    private LocalDateTime createTime;
-    @Column(onInsertValue = "CURRENT_TIMESTAMP", onUpdateValue = "CURRENT_TIMESTAMP")
-    private LocalDateTime updateTime;
-    @Column(onInsertValue = "false")
-    private Boolean isDeleted;
 }

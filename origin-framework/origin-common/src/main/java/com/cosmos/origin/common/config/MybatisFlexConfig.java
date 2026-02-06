@@ -1,19 +1,19 @@
 package com.cosmos.origin.common.config;
 
 import com.mybatisflex.core.audit.AuditManager;
-import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Mybatis Flex 配置
+ * Mybatis Flex 全局配置
+ * <p>
+ * 负责开启SQL审计功能，Mapper扫描由各业务模块自行配置
  *
  * @author 一陌千尘
  * @date 2025/11/03
  */
 @Configuration
-@MapperScan("com.cosmos.origin.common.domain.mapper")
 public class MybatisFlexConfig {
 
     private static final Logger logger = LoggerFactory

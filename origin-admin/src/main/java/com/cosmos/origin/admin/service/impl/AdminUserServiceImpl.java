@@ -1,7 +1,7 @@
 package com.cosmos.origin.admin.service.impl;
 
-import com.cosmos.origin.common.domain.dos.UserDO;
-import com.cosmos.origin.common.domain.mapper.UserMapper;
+import com.cosmos.origin.admin.domain.entity.UserDO;
+import com.cosmos.origin.admin.domain.mapper.UserMapper;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.utils.PageResponse;
 import com.cosmos.origin.common.utils.Response;
