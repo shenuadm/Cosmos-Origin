@@ -26,6 +26,8 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     FORBIDDEN("20004", "权限不足！"),
     NOT_FOUND("20005", "请求路径不存在，请检查路径是否正确！"),
     USER_NOT_ROLE("20006", " 用户未分配角色"),
+    ACCOUNT_LOCKED("20007", "登录失败次数过多，账号已被锁定"),
+    ACCOUNT_DISABLED("20008", "账号已被禁用"),
     ;
 
     // 异常码

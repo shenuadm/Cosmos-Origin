@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +22,8 @@ import java.util.Objects;
 
 /**
  * 自定义登录过滤器
+ * <p>
+ * 支持自定义登录URL和请求参数名
  *
  * @author 一陌千尘
  * @date 2025/11/04
@@ -27,18 +31,52 @@ import java.util.Objects;
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     /**
-     * 指定用户登录的访问地址
+     * 登录URL，默认 /login
+     */
+    @Getter
+    @Setter
+    private String loginProcessingUrl = "/login";
+
+    /**
+     * 用户名字段名，默认 username
+     */
+    @Getter
+    @Setter
+    private String usernameParameter = "username";
+
+    /**
+     * 密码字段名，默认 password
+     */
+    @Getter
+    @Setter
+    private String passwordParameter = "password";
+
+    /**
+     * 默认构造器，使用 /login 作为登录端点
      */
     public JwtAuthenticationFilter() {
-        super(createLoginMatcher());
+        this("/login");
     }
 
-    private static RequestMatcher createLoginMatcher() {
+    /**
+     * 指定登录URL的构造器
+     *
+     * @param loginProcessingUrl 登录处理URL
+     */
+    public JwtAuthenticationFilter(String loginProcessingUrl) {
+        super(createLoginMatcher(loginProcessingUrl));
+        this.loginProcessingUrl = loginProcessingUrl;
+    }
+
+    /**
+     * 创建登录请求匹配器
+     */
+    private static RequestMatcher createLoginMatcher(String loginProcessingUrl) {
         return new RequestMatcher() {
             @Override
             public boolean matches(HttpServletRequest request) {
                 return HttpMethod.POST.name().equalsIgnoreCase(request.getMethod()) &&
-                        "/login".equals(request.getServletPath());
+                        loginProcessingUrl.equals(request.getServletPath());
             }
 
             @Override
@@ -56,8 +94,10 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         ObjectMapper mapper = new ObjectMapper();
         // 解析提交的 JSON 数据
         JsonNode jsonNode = mapper.readTree(request.getInputStream());
-        JsonNode usernameNode = jsonNode.get("username");
-        JsonNode passwordNode = jsonNode.get("password");
+
+        // 使用自定义参数名获取用户名和密码
+        JsonNode usernameNode = jsonNode.get(usernameParameter);
+        JsonNode passwordNode = jsonNode.get(passwordParameter);
 
         // 判断用户名、密码是否为空
         if (Objects.isNull(usernameNode) || Objects.isNull(passwordNode)
@@ -67,6 +107,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         String username = usernameNode.textValue();
         String password = passwordNode.textValue();
+
+        // 将用户名保存到请求属性中，供失败处理器使用
+        request.setAttribute("LOGIN_USERNAME", username);
 
         // 将用户名、密码封装到 Token 中
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken

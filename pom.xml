@@ -21,23 +21,23 @@
 
     <!-- 子模块管理 -->
     <modules>
-        <!-- 入口模块 -->
-        <module>origin-web</module>
-        <!-- JWT 模块 -->
-        <module>origin-jwt</module>
-        <!-- 管理后台 -->
-        <module>origin-admin</module>
-        <!-- 认证服务 -->
-        <module>origin-auth</module>
         <!-- 平台基础框架 -->
         <module>origin-framework</module>
+        <!-- JWT 模块 -->
+        <module>origin-jwt</module>
+        <!-- 认证服务 -->
+        <module>origin-auth</module>
+        <!-- 管理后台 -->
+        <module>origin-admin</module>
+        <!-- 入口模块 -->
+        <module>origin-web</module>
     </modules>
 
     <!-- 版本号统一管理 -->
     <properties>
         <!-- 项目版本号 -->
         <revision>0.0.1-SNAPSHOT</revision>
-        <java.version>25</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Spring AI 版本 -->
         <spring-ai.version>1.1.1</spring-ai.version>

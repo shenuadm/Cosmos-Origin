@@ -1,11 +1,16 @@
 package com.cosmos.origin.web.config;
 
+import com.cosmos.origin.admin.enums.LoginStatusEnum;
 import com.cosmos.origin.admin.enums.RoleTypeEnum;
+import com.cosmos.origin.admin.service.LoginAttemptService;
+import com.cosmos.origin.admin.service.LoginLogService;
 import com.cosmos.origin.jwt.config.JwtAuthenticationSecurityConfig;
 import com.cosmos.origin.jwt.filter.RateLimitFilter;
 import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationEntryPoint;
+import com.cosmos.origin.web.filter.LoginAttemptCheckFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +22,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Map;
+
 /**
  * Spring Security 配置类
  * <p>
- * EnableMethodSecurity 注解表示启用 @PreAuthorize 和 @PostAuthorize 注解，securedEnabled = true 表示启用 @Secured 注解
+ * 演示了如何使用 .with(config, customizer) 进行多种自定义配置
  *
  * @author 一陌千尘
  * @date 2025/11/04
@@ -28,7 +35,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 @Configuration
 @EnableWebSecurity
-// @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
@@ -37,6 +43,13 @@ public class WebSecurityConfig {
     private final RestAccessDeniedHandler deniedHandler;
     private final UserDetailsService userDetailsService;
 
+    // 登录日志和限流服务（可选）
+    private final LoginLogService loginLogService;
+    private final LoginAttemptService loginAttemptService;
+
+    // 登录检查过滤器（可选）
+    private final LoginAttemptCheckFilter loginAttemptCheckFilter;
+
     /**
      * 核心配置
      */
@@ -44,49 +57,104 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            TokenAuthenticationFilter tokenAuthenticationFilter,
                                            RateLimitFilter rateLimitFilter) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable) // 禁用 csrf，防止跨站请求伪造攻击
-                .formLogin(AbstractHttpConfigurer::disable) // 禁用 Spring Security 的默认表单登录页面
-                // 设置用户登录认证相关配置
+        http.csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+
+                // ============================================
+                // 登录认证配置（使用 .with 自定义）
+                // ============================================
                 .with(jwtAuthenticationSecurityConfig, customizer -> {
-                    // 这里可以添加自定义配置（如果需要）
+                    // 1. 修改登录 URL 和参数名（可选）
+                    // customizer.setLoginProcessingUrl("/api/auth/login");
+                    // customizer.setUsernameParameter("email");
+                    // customizer.setPasswordParameter("passwd");
+
+                    // 2. 设置登录成功回调（记录日志）
+                    customizer.setOnLoginSuccess((request, authentication) -> {
+                        String username = authentication.getName();
+                        log.debug("用户 [{}] 登录成功", username);
+
+                        if (loginLogService != null) {
+                            loginLogService.recordLoginLog(username, LoginStatusEnum.SUCCESS, "登录成功", request);
+                        }
+                        if (loginAttemptService != null) {
+                            loginAttemptService.loginSuccess(username);
+                        }
+                    });
+
+                    // 3. 设置登录失败回调（记录日志和限流）
+                    customizer.setOnLoginFailure((request, exception) -> {
+                        String username = getUsernameFromRequest(request);
+                        log.debug("用户 [{}] 登录失败: {}", username, exception.getMessage());
+
+                        // 记录失败次数（在记录日志之前，先记录失败）
+                        if (loginAttemptService != null) {
+                            loginAttemptService.loginFailed(username);
+
+                            // 获取尝试信息并保存到 request，供失败处理器使用
+                            Map<String, Object> attemptInfoMap = loginAttemptService.getAttemptInfoAfterFailure(username);
+                            request.setAttribute("LOGIN_ATTEMPT_INFO_MAP", attemptInfoMap);
+                        }
+
+                        // 记录失败日志
+                        if (loginLogService != null) {
+                            String message = exception instanceof org.springframework.security.authentication.BadCredentialsException
+                                    ? "用户名或密码错误" : exception.getMessage();
+                            loginLogService.recordLoginLog(username, LoginStatusEnum.FAILED, message, request);
+                        }
+                    });
                 })
+
                 // 配置记住我功能
                 .rememberMe(remember -> remember
-                        .key("uniqueAndSecretKey")               // 加密密钥
-                        .tokenValiditySeconds(7 * 24 * 60 * 60)  // 7天有效期
-                        .userDetailsService(userDetailsService)  // 用户服务
-                        .rememberMeParameter("rememberMe")       // 表单参数名
+                        .key("uniqueAndSecretKey")
+                        .tokenValiditySeconds(7 * 24 * 60 * 60)
+                        .userDetailsService(userDetailsService)
+                        .rememberMeParameter("rememberMe")
                 )
-                .authorizeHttpRequests(authorize -> { // 处理请求
-                    // 放开哪些接口
-                    authorize.requestMatchers("/login", "/logout", "/test").permitAll(); // 登录接口，登出接口，测试接口
-                    authorize.requestMatchers("/doc.html", "/v3/api-docs/**", "/favicon.ico", "/webjars/**", "/.well-known/**").permitAll(); // knife4j 接口文档
-                    // 用户管理相关接口
+                .authorizeHttpRequests(authorize -> {
+                    // 放开登录相关接口
+                    authorize.requestMatchers("/login", "/logout", "/test").permitAll();
+                    // Knife4j 接口文档
+                    authorize.requestMatchers("/doc.html", "/v3/api-docs/**", "/favicon.ico", "/webjars/**", "/.well-known/**").permitAll();
+                    // 管理后台接口需要系统管理员权限
                     authorize.requestMatchers("/manage/user/**").hasAuthority(RoleTypeEnum.SYSTEM_ADMIN.getRoleKey());
-                    // 角色管理相关接口
                     authorize.requestMatchers("/manage/role/**").hasAuthority(RoleTypeEnum.SYSTEM_ADMIN.getRoleKey());
 
                     authorize.anyRequest().authenticated();
                 })
                 // 错误处理
                 .exceptionHandling(m -> {
-                    m.authenticationEntryPoint(authEntryPoint); // 认证失败处理 401，处理用户未登录访问受保护的资源的情况
-                    m.accessDeniedHandler(deniedHandler); // 拒绝访问处理 403，处理登录成功后访问受保护的资源，但是权限不够的情况
+                    m.authenticationEntryPoint(authEntryPoint);
+                    m.accessDeniedHandler(deniedHandler);
                 })
                 // 前后端分离，无需创建会话
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-                // 添加限流过滤器（最高优先级，在所有自定义过滤器之前）
-                // .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-                // 将 Token 校验过滤器添加到用户认证过滤器之前，如果使用 token 这个配置是必须的
-                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                // 添加登录尝试检查过滤器（在认证过滤器之前）
+                .addFilterBefore(loginAttemptCheckFilter, UsernamePasswordAuthenticationFilter.class)
+                // 添加 Token 校验过滤器
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // 配置异常处理，处理 LoginAttemptExceededException
+                .exceptionHandling(m -> {
+                    m.authenticationEntryPoint(authEntryPoint);
+                    m.accessDeniedHandler(deniedHandler);
+                    // 注意：Spring Security 的异常处理可能捕获不到 Filter 中的异常
+                    // 需要在 Filter 内部处理或全局异常处理器处理
+                });
 
         return http.build();
     }
 
     /**
+     * 从请求中获取用户名
+     */
+    private String getUsernameFromRequest(HttpServletRequest request) {
+        String username = (String) request.getAttribute("LOGIN_USERNAME");
+        return username != null ? username : "unknown";
+    }
+
+    /**
      * Token 校验过滤器
-     *
-     * @return Token 校验过滤器
      */
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
@@ -95,8 +163,6 @@ public class WebSecurityConfig {
 
     /**
      * 限流过滤器
-     *
-     * @return 限流过滤器
      */
     @Bean
     public RateLimitFilter rateLimitFilter() {
