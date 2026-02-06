@@ -4,7 +4,7 @@ import com.cosmos.origin.admin.domain.entity.UserRoleRelDO;
 import com.mybatisflex.core.BaseMapper;
 
 /**
- * 用户角色关联Mapper
+ * 用户角色关联 Mapper
  *
  * @author 一陌千尘
  * @date 2025/11/05

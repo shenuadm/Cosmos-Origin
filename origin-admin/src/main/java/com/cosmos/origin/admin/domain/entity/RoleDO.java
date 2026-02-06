@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 角色DO
+ * 角色实体类
  *
  * @author 一陌千尘
  * @date 2025/11/05

@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * 用户详情服务实现类
  * <p>
- * 负责从数据库加载用户信息和角色，供Spring Security使用
+ * 负责从数据库加载用户信息和角色，供 Spring Security 使用
  *
  * @author 一陌千尘
  * @date 2025/11/04
@@ -37,6 +37,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private final RoleMapper roleMapper;
 
     @Override
+    @SuppressWarnings("unchecked")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 从数据库中查询
         UserDO userDO = userMapper.findByUsername(username);
@@ -49,10 +50,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
         // 查询用户角色
         List<RoleDO> roleDOS = roleMapper.selectListByQuery(QueryWrapper.create()
                 .select(RoleDO::getRoleKey)
-                .from(RoleDO.class).as("tr")
-                .innerJoin(UserRoleRelDO.class).as("tur")
-                .on("tr.id = tur.role_id")
-                .where("tur.user_id = " + userDO.getId()));
+                .from(RoleDO.class)
+                .innerJoin(UserRoleRelDO.class)
+                .on(RoleDO::getId, UserRoleRelDO::getRoleId)
+                .where(UserRoleRelDO::getUserId).eq(userDO.getId()));
         if (CollectionUtils.isEmpty(roleDOS)) {
             throw new BizException(ResponseCodeEnum.USER_NOT_ROLE);
         }
