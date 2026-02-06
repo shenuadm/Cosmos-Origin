@@ -41,7 +41,9 @@ public class WebSecurityConfig {
      * 核心配置
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           TokenAuthenticationFilter tokenAuthenticationFilter,
+                                           RateLimitFilter rateLimitFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable) // 禁用 csrf，防止跨站请求伪造攻击
                 .formLogin(AbstractHttpConfigurer::disable) // 禁用 Spring Security 的默认表单登录页面
                 // 设置用户登录认证相关配置
@@ -73,10 +75,10 @@ public class WebSecurityConfig {
                 })
                 // 前后端分离，无需创建会话
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-                // 在 Token 过滤器之前添加限流过滤器
-                // .addFilterBefore(new RateLimitFilter(), TokenAuthenticationFilter.class)
+                // 添加限流过滤器（最高优先级，在所有自定义过滤器之前）
+                // .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 // 将 Token 校验过滤器添加到用户认证过滤器之前，如果使用 token 这个配置是必须的
-                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -89,5 +91,15 @@ public class WebSecurityConfig {
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter();
+    }
+
+    /**
+     * 限流过滤器
+     *
+     * @return 限流过滤器
+     */
+    @Bean
+    public RateLimitFilter rateLimitFilter() {
+        return new RateLimitFilter();
     }
 }

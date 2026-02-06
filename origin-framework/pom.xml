@@ -21,7 +21,7 @@
         <!-- 通用工具组件 -->
         <module>origin-common</module>
         <!-- 接口日志组件 -->
-        <module>origin-spring-boot-starter-biz-operationlog</module>
+        <module>origin-biz-operationlog-spring-boot-starter</module>
     </modules>
 
 </project>
