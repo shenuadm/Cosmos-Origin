@@ -94,23 +94,22 @@ public class WebSecurityConfig {
                         // 检查是否为锁定异常，如果是锁定异常则不增加失败次数
                         boolean isLockedExceptionType = exception instanceof org.springframework.security.authentication.LockedException;
 
-                        // 记录失败次数（只有非锁定状态下的失败才增加计数）
-                        if (loginAttemptService != null && !isLockedExceptionType) {
-                            loginAttemptService.loginFailed(username);
+                        // 如果登录次数限制功能开启，记录失败次数和尝试信息
+                        if (loginAttemptService != null && loginAttemptService.isEnabled()) {
+                            // 记录失败次数（只有非锁定状态下的失败才增加计数）
+                            if (!isLockedExceptionType) {
+                                loginAttemptService.loginFailed(username);
+                            }
 
                             // 获取尝试信息并保存到 request，供失败处理器使用
                             Map<String, Object> attemptInfoMap = loginAttemptService.getAttemptInfoAfterFailure(username);
                             request.setAttribute("LOGIN_ATTEMPT_INFO_MAP", attemptInfoMap);
-                        } else if (loginAttemptService != null) {
-                            // 账号已锁定，直接获取锁定信息
-                            Map<String, Object> attemptInfoMap = loginAttemptService.getAttemptInfoAfterFailure(username);
-                            request.setAttribute("LOGIN_ATTEMPT_INFO_MAP", attemptInfoMap);
                         }
 
-                        // 记录失败日志，根据账号是否被锁定记录正确的状态
+                        // 记录失败日志
                         if (loginLogService != null) {
-                            // 判断账号是否已被锁定
-                            boolean isLocked = loginAttemptService != null && loginAttemptService.isLocked(username);
+                            // 判断账号是否已被锁定（只有功能开启时才检查）
+                            boolean isLocked = loginAttemptService != null && loginAttemptService.isEnabled() && loginAttemptService.isLocked(username);
 
                             LoginStatusEnum status;
                             String message;

@@ -20,6 +20,16 @@ jwt:
   # token 请求头中的 value 值前缀
   tokenPrefix: Bearer
 
+# 登录次数限制配置
+login:
+  attempt:
+    # 是否开启登录次数限制功能（true: 开启, false: 关闭）
+    enabled: false
+    # 最大失败次数，超过该次数将锁定账号（默认: 5）
+    max-attempts: 5
+    # 账号锁定时间（单位：分钟，默认: 30）
+    lock-duration-minutes: 30
+
 # springdoc-openapi 配置
 springdoc:
   swagger-ui:

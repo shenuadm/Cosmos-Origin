@@ -3,8 +3,10 @@ package com.cosmos.origin.admin.service;
 import com.cosmos.origin.admin.domain.dos.UserDO;
 import com.cosmos.origin.admin.domain.mapper.UserMapper;
 import com.cosmos.origin.jwt.utils.LoginResponseUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.stereotype.Service;
@@ -33,9 +35,18 @@ public class LoginAttemptService {
     private static final String LOGIN_ATTEMPT_KEY_PREFIX = "login:attempt:";
     private static final String LOGIN_LOCKED_KEY_PREFIX = "login:locked:";
 
-    // 默认配置
-    private static final int DEFAULT_MAX_ATTEMPTS = 5;           // 最大尝试次数
-    private static final int DEFAULT_LOCK_DURATION_MINUTES = 30; // 锁定时间（分钟）
+    // 配置项：是否开启登录次数限制功能
+    @Getter
+    @Value("${login.attempt.enabled:true}")
+    private boolean enabled;
+
+    // 配置项：最大尝试次数
+    @Value("${login.attempt.max-attempts:5}")
+    private int maxAttempts;
+
+    // 配置项：锁定时间（分钟）
+    @Value("${login.attempt.lock-duration-minutes:30}")
+    private int lockDurationMinutes;
 
     /**
      * 检查用户是否被锁定
@@ -44,6 +55,11 @@ public class LoginAttemptService {
      * @throws LockedException 如果账号被锁定
      */
     public void checkLocked(String username) {
+        // 如果功能未开启，直接跳过检查
+        if (!enabled) {
+            return;
+        }
+
         String lockedKey = LOGIN_LOCKED_KEY_PREFIX + username;
         Boolean isLocked = redisTemplate.hasKey(lockedKey);
 
@@ -70,6 +86,11 @@ public class LoginAttemptService {
      * @param username 用户名
      */
     public void loginFailed(String username) {
+        // 如果功能未开启，直接跳过
+        if (!enabled) {
+            return;
+        }
+
         String attemptKey = LOGIN_ATTEMPT_KEY_PREFIX + username;
         String lockedKey = LOGIN_LOCKED_KEY_PREFIX + username;
 
@@ -79,15 +100,15 @@ public class LoginAttemptService {
         if (attempts != null) {
             // 设置过期时间（第一次失败时设置）
             if (attempts == 1) {
-                redisTemplate.expire(attemptKey, Duration.ofMinutes(DEFAULT_LOCK_DURATION_MINUTES));
+                redisTemplate.expire(attemptKey, Duration.ofMinutes(lockDurationMinutes));
             }
 
-            log.warn("用户 [{}] 登录失败，当前尝试次数: {}/{}", username, attempts, DEFAULT_MAX_ATTEMPTS);
+            log.warn("用户 [{}] 登录失败，当前尝试次数: {}/{}", username, attempts, maxAttempts);
 
-            // 达到最大尝试次数，锁定账号（第5次失败时锁定）
-            if (attempts >= DEFAULT_MAX_ATTEMPTS) {
-                log.warn("用户 [{}] 登录失败次数达到 {} 次，账号已被锁定 {} 分钟", username, DEFAULT_MAX_ATTEMPTS, DEFAULT_LOCK_DURATION_MINUTES);
-                redisTemplate.opsForValue().set(lockedKey, "locked", DEFAULT_LOCK_DURATION_MINUTES, TimeUnit.MINUTES);
+            // 达到最大尝试次数，锁定账号
+            if (attempts >= maxAttempts) {
+                log.warn("用户 [{}] 登录失败次数达到 {} 次，账号已被锁定 {} 分钟", username, maxAttempts, lockDurationMinutes);
+                redisTemplate.opsForValue().set(lockedKey, "locked", lockDurationMinutes, TimeUnit.MINUTES);
                 // 注意：删除尝试次数记录应该在打印日志之后，避免后续查询时获取不到次数
                 redisTemplate.delete(attemptKey);
             }
@@ -100,6 +121,11 @@ public class LoginAttemptService {
      * @param username 用户名
      */
     public void loginSuccess(String username) {
+        // 如果功能未开启，直接跳过
+        if (!enabled) {
+            return;
+        }
+
         String attemptKey = LOGIN_ATTEMPT_KEY_PREFIX + username;
         redisTemplate.delete(attemptKey);
         log.debug("用户 [{}] 登录成功，清除失败次数记录", username);
@@ -112,6 +138,11 @@ public class LoginAttemptService {
      * @return 剩余尝试次数，-1 表示未被限制
      */
     public int getRemainingAttempts(String username) {
+        // 如果功能未开启，返回 -1 表示无限制
+        if (!enabled) {
+            return -1;
+        }
+
         String lockedKey = LOGIN_LOCKED_KEY_PREFIX + username;
         if (redisTemplate.hasKey(lockedKey)) {
             return 0;
@@ -120,11 +151,11 @@ public class LoginAttemptService {
         String attemptKey = LOGIN_ATTEMPT_KEY_PREFIX + username;
         String attemptsStr = redisTemplate.opsForValue().get(attemptKey);
         if (attemptsStr == null) {
-            return DEFAULT_MAX_ATTEMPTS;
+            return maxAttempts;
         }
 
         int attempts = Integer.parseInt(attemptsStr);
-        return Math.max(0, DEFAULT_MAX_ATTEMPTS - attempts);
+        return Math.max(0, maxAttempts - attempts);
     }
 
     /**
@@ -149,6 +180,11 @@ public class LoginAttemptService {
      * @return true 表示被锁定
      */
     public boolean isLocked(String username) {
+        // 如果功能未开启，永远返回 false（未锁定）
+        if (!enabled) {
+            return false;
+        }
+
         String lockedKey = LOGIN_LOCKED_KEY_PREFIX + username;
         return redisTemplate.hasKey(lockedKey);
     }
@@ -160,6 +196,11 @@ public class LoginAttemptService {
      * @return 剩余分钟数，0表示未锁定
      */
     public long getLockRemainingMinutes(String username) {
+        // 如果功能未开启，返回 0
+        if (!enabled) {
+            return 0;
+        }
+
         String lockedKey = LOGIN_LOCKED_KEY_PREFIX + username;
         Long ttl = redisTemplate.getExpire(lockedKey, TimeUnit.MINUTES);
         return Math.max(0, ttl);
@@ -196,6 +237,11 @@ public class LoginAttemptService {
      * @return 登录尝试信息 Map
      */
     public Map<String, Object> getAttemptInfo(String username) {
+        // 如果功能未开启，返回空信息
+        if (!enabled) {
+            return LoginResponseUtil.createAttemptData(0, -1);
+        }
+
         // 检查是否被锁定
         if (isLocked(username)) {
             long lockRemainingMinutes = getLockRemainingMinutes(username);
@@ -204,11 +250,11 @@ public class LoginAttemptService {
 
         // 获取当前尝试次数
         int currentAttempts = getCurrentAttempts(username);
-        int remainingAttempts = Math.max(0, DEFAULT_MAX_ATTEMPTS - currentAttempts);
+        int remainingAttempts = Math.max(0, maxAttempts - currentAttempts);
 
         Map<String, Object> result = LoginResponseUtil.createAttemptData(currentAttempts, remainingAttempts);
-        result.put("message", String.format("登录失败，这是第 %d 次尝试，还有 %d 次机会，超过 %d 次后账号将被锁定 30 分钟",
-                currentAttempts, remainingAttempts, DEFAULT_MAX_ATTEMPTS));
+        result.put("message", String.format("登录失败，这是第 %d 次尝试，还有 %d 次机会，超过 %d 次后账号将被锁定 %d 分钟",
+                currentAttempts, remainingAttempts, maxAttempts, lockDurationMinutes));
 
         return result;
     }

@@ -42,6 +42,12 @@ public class LoginAttemptCheckFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        // 如果功能未开启，直接放行
+        if (!loginAttemptService.isEnabled()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 只处理登录请求
         if (isLoginRequest(request)) {
             String username = extractUsername(request);
