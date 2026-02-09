@@ -13,3 +13,21 @@ spring:
       max-lifetime: 1800000 # 30m，连接在连接池中的最大存活时间，超过这个时间会被强制关闭（单位：毫秒）
       connection-timeout: 30000 # 30s，获取连接的超时时间（单位：毫秒）
       connection-test-query: SELECT 1 # 用于测试连接是否可用的SQL查询语句
+  
+  # Redis 配置（用于登录限流）
+  # 如果 Redis 未启动，请使用 docker run -d --name redis -p 6379:6379 redis:latest 启动
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: wzw123!@# # 如果 Redis 设置了密码，在此填写
+      database: 0
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+      # 连接超时时间（如果 Redis 不可用，快速失败）
+      connect-timeout: 2000ms
+      timeout: 2000ms
