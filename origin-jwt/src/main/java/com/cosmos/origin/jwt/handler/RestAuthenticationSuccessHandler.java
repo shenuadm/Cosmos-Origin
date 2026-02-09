@@ -6,8 +6,10 @@ import com.cosmos.origin.jwt.utils.JwtTokenHelper;
 import com.cosmos.origin.jwt.utils.ResultUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
 /**
  * 登录成功处理
@@ -22,12 +25,32 @@ import java.io.IOException;
  * @author 一陌千尘
  * @date 2025/07/14
  */
-@RequiredArgsConstructor
 @Component
 @Slf4j
 public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenHelper jwtTokenHelper;
+
+    @Value("${jwt.tokenExpireTime}")
+    private Long tokenExpireTime;
+
+    @Value("${jwt.rememberMeExpireTime:10080}")
+    private Long rememberMeExpireTime;
+
+    /**
+     * 会话保存回调（由外部注入，用于保存会话到 Redis）
+     * 参数：(request, token, expireMinutes)
+     * -- SETTER --
+     * 设置会话保存回调（用于保存会话到 Redis）
+     *
+     */
+    @Setter
+    private BiConsumer<HttpServletRequest, String> sessionSaveCallback;
+
+    @Autowired
+    public RestAuthenticationSuccessHandler(JwtTokenHelper jwtTokenHelper) {
+        this.jwtTokenHelper = jwtTokenHelper;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -36,16 +59,32 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         // 通过用户名生成 Token
         String username = userDetails.getUsername();
-        
+
         // 检查是否勾选了"记住我"
         Boolean rememberMe = (Boolean) request.getAttribute("REMEMBER_ME");
         String token;
+        Long expireMinutes;
         if (Boolean.TRUE.equals(rememberMe)) {
             // 记住我：使用记住我 token 过期时间（默认 7 天）
             token = jwtTokenHelper.generateRememberMeToken(username);
+            expireMinutes = rememberMeExpireTime;
         } else {
             // 正常登录：使用默认过期时间
             token = jwtTokenHelper.generateToken(username);
+            expireMinutes = tokenExpireTime;
+        }
+
+        // 保存 token 到请求属性，供回调使用
+        request.setAttribute("LOGIN_TOKEN", token);
+        request.setAttribute("TOKEN_EXPIRE_MINUTES", expireMinutes);
+
+        // 调用会话保存回调
+        if (sessionSaveCallback != null) {
+            try {
+                sessionSaveCallback.accept(request, token);
+            } catch (Exception e) {
+                log.error("保存用户会话失败", e);
+            }
         }
 
         // 返回 Token

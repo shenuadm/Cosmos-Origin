@@ -1,26 +1,36 @@
 package com.cosmos.origin.web.config;
 
+import com.cosmos.origin.admin.domain.dos.UserDO;
+import com.cosmos.origin.admin.domain.mapper.UserMapper;
 import com.cosmos.origin.admin.enums.LoginStatusEnum;
 import com.cosmos.origin.admin.enums.RoleTypeEnum;
+import com.cosmos.origin.admin.model.vo.session.UserSessionVO;
 import com.cosmos.origin.admin.service.LoginAttemptService;
 import com.cosmos.origin.admin.service.LoginLogService;
+import com.cosmos.origin.admin.service.UserSessionService;
+import com.cosmos.origin.admin.utils.IpLocationUtil;
 import com.cosmos.origin.jwt.config.JwtAuthenticationSecurityConfig;
 import com.cosmos.origin.jwt.filter.RateLimitFilter;
 import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationEntryPoint;
+import com.cosmos.origin.jwt.handler.RestAuthenticationSuccessHandler;
+import com.cosmos.origin.jwt.utils.RequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -45,6 +55,57 @@ public class WebSecurityConfig {
     // 登录日志和限流服务（可选）
     private final LoginLogService loginLogService;
     private final LoginAttemptService loginAttemptService;
+    private final UserSessionService userSessionService;
+    private final UserMapper userMapper;
+
+    /**
+     * 注入并配置登录成功处理器的会话保存回调
+     */
+    @Autowired
+    public void configureSuccessHandler(RestAuthenticationSuccessHandler successHandler) {
+        successHandler.setSessionSaveCallback((request, token) -> {
+            try {
+                String username = (String) request.getAttribute("LOGIN_USERNAME");
+                Long expireMinutes = (Long) request.getAttribute("TOKEN_EXPIRE_MINUTES");
+                Boolean rememberMe = (Boolean) request.getAttribute("REMEMBER_ME");
+                String rolesStr = (String) request.getAttribute("USER_ROLES");
+
+                // 查询用户信息
+                UserDO userDO = userMapper.findByUsername(username);
+                if (userDO == null) {
+                    log.warn("用户 [{}] 不存在，无法保存会话", username);
+                    return;
+                }
+
+                // 解析角色列表
+                java.util.List<String> roles = rolesStr != null && !rolesStr.isEmpty() 
+                        ? java.util.Arrays.asList(rolesStr.split(",")) 
+                        : java.util.Collections.emptyList();
+
+                // 构建会话信息
+                String ip = RequestUtil.getClientIp(request);
+                UserSessionVO sessionVO = UserSessionVO.builder()
+                        .username(username)
+                        .userId(userDO.getId())
+                        .nickname(userDO.getNickname())
+                        .roles(roles)
+                        .token(token)
+                        .loginTime(LocalDateTime.now())
+                        .loginIp(ip)
+                        .loginLocation(IpLocationUtil.getLocation(ip))
+                        .browser(RequestUtil.getBrowser(request))
+                        .os(RequestUtil.getOperatingSystem(request))
+                        .rememberMe(Boolean.TRUE.equals(rememberMe))
+                        .expireTime(LocalDateTime.now().plusMinutes(expireMinutes))
+                        .build();
+
+                // 保存会话到 Redis
+                userSessionService.saveSession(sessionVO, expireMinutes);
+            } catch (Exception e) {
+                log.error("保存用户会话失败", e);
+            }
+        });
+    }
 
     /**
      * 核心配置
@@ -77,6 +138,13 @@ public class WebSecurityConfig {
                     customizer.setOnLoginSuccess((request, authentication) -> {
                         String username = authentication.getName();
                         log.debug("用户 [{}] 登录成功", username);
+
+                        // 保存角色信息到请求属性，供会话保存使用
+                        String roles = authentication.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .reduce((a, b) -> a + "," + b)
+                                .orElse("");
+                        request.setAttribute("USER_ROLES", roles);
 
                         if (loginLogService != null) {
                             loginLogService.recordLoginLog(username, LoginStatusEnum.SUCCESS, "登录成功", request);
