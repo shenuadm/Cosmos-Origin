@@ -131,13 +131,6 @@ public class WebSecurityConfig {
                     });
                 })
 
-                // 配置记住我功能
-                .rememberMe(remember -> remember
-                        .key("uniqueAndSecretKey")
-                        .tokenValiditySeconds(7 * 24 * 60 * 60)
-                        .userDetailsService(userDetailsService)
-                        .rememberMeParameter("rememberMe")
-                )
                 .authorizeHttpRequests(authorize -> {
                     // 放开登录相关接口
                     authorize.requestMatchers("/login", "/logout", "/test").permitAll();

@@ -36,7 +36,17 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         // 通过用户名生成 Token
         String username = userDetails.getUsername();
-        String token = jwtTokenHelper.generateToken(username);
+        
+        // 检查是否勾选了"记住我"
+        Boolean rememberMe = (Boolean) request.getAttribute("REMEMBER_ME");
+        String token;
+        if (Boolean.TRUE.equals(rememberMe)) {
+            // 记住我：使用记住我 token 过期时间（默认 7 天）
+            token = jwtTokenHelper.generateRememberMeToken(username);
+        } else {
+            // 正常登录：使用默认过期时间
+            token = jwtTokenHelper.generateToken(username);
+        }
 
         // 返回 Token
         LoginRspVO loginRspVO = LoginRspVO.builder()

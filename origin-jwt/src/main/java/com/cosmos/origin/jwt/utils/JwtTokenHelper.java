@@ -47,6 +47,12 @@ public class JwtTokenHelper implements InitializingBean {
     private Long tokenExpireTime;
 
     /**
+     * 记住我 Token 失效时间（分钟）
+     */
+    @Value("${jwt.rememberMeExpireTime}")
+    private Long rememberMeExpireTime;
+
+    /**
      * 生成一个 Base64 的安全秘钥
      *
      * @return Base64 的安全秘钥
@@ -103,6 +109,37 @@ public class JwtTokenHelper implements InitializingBean {
                 .setExpiration(Date.from(expireTime.atZone(ZoneId.systemDefault()).toInstant()))
                 .signWith(key)
                 .compact();
+    }
+
+    /**
+     * 生成 Token（支持自定义过期时间）
+     *
+     * @param username 用户名
+     * @param expireMinutes Token 过期时间（分钟）
+     * @return Token
+     */
+    public String generateToken(String username, Long expireMinutes) {
+        LocalDateTime now = LocalDateTime.now();
+        // 设置 Token 失效时间
+        LocalDateTime expireTime = now.plusMinutes(expireMinutes);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuer(issuer)
+                .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(expireTime.atZone(ZoneId.systemDefault()).toInstant()))
+                .signWith(key)
+                .compact();
+    }
+
+    /**
+     * 生成记住我 Token（有效期为配置的记住我过期时间）
+     *
+     * @param username 用户名
+     * @return Token
+     */
+    public String generateRememberMeToken(String username) {
+        return generateToken(username, rememberMeExpireTime);
     }
 
     /**

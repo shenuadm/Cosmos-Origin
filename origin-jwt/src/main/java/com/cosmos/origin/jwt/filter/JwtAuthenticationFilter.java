@@ -53,6 +53,13 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     private String passwordParameter = "password";
 
     /**
+     * 记住我字段名，默认 rememberMe
+     */
+    @Getter
+    @Setter
+    private String rememberMeParameter = "rememberMe";
+
+    /**
      * 账号锁定检查函数（在密码验证前执行）
      */
     @Setter
@@ -110,6 +117,11 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         // 将用户名保存到请求属性中，供失败处理器使用
         request.setAttribute("LOGIN_USERNAME", username);
+
+        // 获取记住我参数并保存到请求属性中
+        JsonNode rememberMeNode = jsonNode.get(rememberMeParameter);
+        boolean rememberMe = rememberMeNode != null && rememberMeNode.asBoolean(false);
+        request.setAttribute("REMEMBER_ME", rememberMe);
 
         // 在密码验证前检查账号是否被锁定
         if (lockCheckFunction != null) {

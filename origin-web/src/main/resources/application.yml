@@ -15,6 +15,8 @@ jwt:
   secret: HpOdsqmwOqtJcq3AzargcLbYKTp7qijmrPv4Mx9rLbGcS2mB0USGdmsPYJXso9zTVzWA/Tmrh/iW1irD8nYYTQ==
   # token 过期时间（单位：分钟） 24*60
   tokenExpireTime: 1440
+  # 记住我功能 token 过期时间（单位：分钟） 7*24*60
+  rememberMeExpireTime: 10080
   # token 请求头中的 key 值
   tokenHeaderKey: Authorization
   # token 请求头中的 value 值前缀
