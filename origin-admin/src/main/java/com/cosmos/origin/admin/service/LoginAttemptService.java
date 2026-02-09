@@ -1,6 +1,6 @@
 package com.cosmos.origin.admin.service;
 
-import com.cosmos.origin.admin.domain.entity.UserDO;
+import com.cosmos.origin.admin.domain.dos.UserDO;
 import com.cosmos.origin.admin.domain.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

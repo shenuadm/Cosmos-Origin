@@ -1,6 +1,6 @@
 package com.cosmos.origin.admin.domain.mapper;
 
-import com.cosmos.origin.admin.domain.entity.RoleDO;
+import com.cosmos.origin.admin.domain.dos.RoleDO;
 import com.mybatisflex.core.BaseMapper;
 
 /**

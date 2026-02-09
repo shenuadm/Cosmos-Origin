@@ -1,6 +1,6 @@
 package com.cosmos.origin.admin.domain.mapper;
 
-import com.cosmos.origin.admin.domain.entity.LoginLogDO;
+import com.cosmos.origin.admin.domain.dos.LoginLogDO;
 import com.mybatisflex.core.BaseMapper;
 
 /**

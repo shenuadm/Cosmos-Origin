@@ -1,6 +1,6 @@
 package com.cosmos.origin.admin.service.impl;
 
-import com.cosmos.origin.admin.domain.entity.RoleDO;
+import com.cosmos.origin.admin.domain.dos.RoleDO;
 import com.cosmos.origin.admin.domain.mapper.RoleMapper;
 import com.cosmos.origin.common.model.vo.SelectRspVO;
 import com.cosmos.origin.common.utils.PageResponse;

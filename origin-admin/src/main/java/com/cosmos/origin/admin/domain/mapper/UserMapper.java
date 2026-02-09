@@ -1,6 +1,6 @@
 package com.cosmos.origin.admin.domain.mapper;
 
-import com.cosmos.origin.admin.domain.entity.UserDO;
+import com.cosmos.origin.admin.domain.dos.UserDO;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.query.QueryWrapper;
 

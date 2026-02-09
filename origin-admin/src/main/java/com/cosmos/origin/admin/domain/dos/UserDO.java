@@ -1,4 +1,4 @@
-package com.cosmos.origin.admin.domain.entity;
+package com.cosmos.origin.admin.domain.dos;
 
 import com.cosmos.origin.common.model.BaseEntity;
 import com.mybatisflex.annotation.Id;

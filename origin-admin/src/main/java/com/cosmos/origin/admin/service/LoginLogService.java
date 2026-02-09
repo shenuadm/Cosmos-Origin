@@ -1,6 +1,6 @@
 package com.cosmos.origin.admin.service;
 
-import com.cosmos.origin.admin.domain.entity.LoginLogDO;
+import com.cosmos.origin.admin.domain.dos.LoginLogDO;
 import com.cosmos.origin.admin.domain.mapper.LoginLogMapper;
 import com.cosmos.origin.admin.enums.LoginStatusEnum;
 import eu.bitwalker.useragentutils.Browser;
