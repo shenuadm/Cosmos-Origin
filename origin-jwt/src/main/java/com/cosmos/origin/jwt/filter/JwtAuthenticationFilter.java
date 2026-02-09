@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
      */
     @Getter
     @Setter
-    private String loginProcessingUrl = "/login";
+    private String loginProcessingUrl;
 
     /**
      * 用户名字段名，默认 username
@@ -50,13 +50,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     @Getter
     @Setter
     private String passwordParameter = "password";
-
-    /**
-     * 默认构造器，使用 /login 作为登录端点
-     */
-    public JwtAuthenticationFilter() {
-        this("/login");
-    }
 
     /**
      * 指定登录URL的构造器

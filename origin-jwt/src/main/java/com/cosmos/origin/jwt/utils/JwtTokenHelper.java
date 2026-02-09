@@ -59,7 +59,7 @@ public class JwtTokenHelper implements InitializingBean {
         return Base64.getEncoder().encodeToString(secretKey.getEncoded());
     }
 
-    static void main() {
+    public static void main(String[] args) {
         String key = generateBase64Key();
         log.info("key: {}", key);
     }

@@ -42,7 +42,17 @@ import java.util.function.Consumer;
 @Configuration
 public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
+    /**
+     * -- GETTER --
+     *  获取默认成功处理器
+     */
+    @Getter
     private final RestAuthenticationSuccessHandler defaultSuccessHandler;
+    /**
+     * -- GETTER --
+     *  获取默认失败处理器
+     */
+    @Getter
     private final RestAuthenticationFailureHandler defaultFailureHandler;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
@@ -144,20 +154,16 @@ public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<D
     private AuthenticationSuccessHandler createSuccessHandler() {
         AuthenticationSuccessHandler delegate = customSuccessHandler != null ? customSuccessHandler : defaultSuccessHandler;
 
-        return new AuthenticationSuccessHandler() {
-            @Override
-            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                                Authentication authentication) throws IOException, ServletException {
-                // 1. 执行原有成功处理逻辑
-                delegate.onAuthenticationSuccess(request, response, authentication);
+        return (request, response, authentication) -> {
+            // 1. 执行原有成功处理逻辑
+            delegate.onAuthenticationSuccess(request, response, authentication);
 
-                // 2. 执行回调（如果有）
-                if (onLoginSuccess != null) {
-                    try {
-                        onLoginSuccess.accept(request, authentication);
-                    } catch (Exception e) {
-                        log.error("登录成功回调执行失败", e);
-                    }
+            // 2. 执行回调（如果有）
+            if (onLoginSuccess != null) {
+                try {
+                    onLoginSuccess.accept(request, authentication);
+                } catch (Exception e) {
+                    log.error("登录成功回调执行失败", e);
                 }
             }
         };
@@ -188,17 +194,4 @@ public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<D
         };
     }
 
-    /**
-     * 获取默认成功处理器
-     */
-    public RestAuthenticationSuccessHandler getDefaultSuccessHandler() {
-        return defaultSuccessHandler;
-    }
-
-    /**
-     * 获取默认失败处理器
-     */
-    public RestAuthenticationFailureHandler getDefaultFailureHandler() {
-        return defaultFailureHandler;
-    }
 }

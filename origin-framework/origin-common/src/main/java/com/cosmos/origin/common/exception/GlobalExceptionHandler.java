@@ -82,7 +82,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({NoResourceFoundException.class})
     @ResponseBody
     public Response<Object> handleNoResourceFoundException(HttpServletRequest request, NoResourceFoundException e) {
-        // log.warn("{} request error, ", request.getRequestURI(), e);
         return Response.fail(ResponseCodeEnum.NOT_FOUND);
     }
 

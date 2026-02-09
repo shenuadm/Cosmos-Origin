@@ -35,7 +35,7 @@ import java.util.Map;
 public class LoginAttemptCheckFilter extends OncePerRequestFilter {
 
     private final LoginAttemptService loginAttemptService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
@@ -93,8 +93,8 @@ public class LoginAttemptCheckFilter extends OncePerRequestFilter {
     private boolean isLoginRequest(HttpServletRequest request) {
         return "POST".equalsIgnoreCase(request.getMethod()) &&
                 ("/login".equals(request.getServletPath()) ||
-                 "/api/auth/login".equals(request.getServletPath()) ||
-                 "/api/v1/login".equals(request.getServletPath()));
+                        "/api/auth/login".equals(request.getServletPath()) ||
+                        "/api/v1/login".equals(request.getServletPath()));
     }
 
     /**

@@ -138,8 +138,6 @@ public class WebSecurityConfig {
                 .exceptionHandling(m -> {
                     m.authenticationEntryPoint(authEntryPoint);
                     m.accessDeniedHandler(deniedHandler);
-                    // 注意：Spring Security 的异常处理可能捕获不到 Filter 中的异常
-                    // 需要在 Filter 内部处理或全局异常处理器处理
                 });
 
         return http.build();
