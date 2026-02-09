@@ -3,6 +3,7 @@ package com.cosmos.origin.jwt.handler;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.utils.Response;
 import com.cosmos.origin.jwt.exception.UsernameOrPasswordNullException;
+import com.cosmos.origin.jwt.utils.LoginResponseUtil;
 import com.cosmos.origin.jwt.utils.ResultUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,12 +72,7 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
             lockRemainingMinutes = (Long) attemptInfoMap.getOrDefault("lockRemainingMinutes", 0L);
         }
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("currentAttempts", 0);
-        data.put("maxAttempts", 5);
-        data.put("remainingAttempts", 0);
-        data.put("locked", true);
-        data.put("lockRemainingMinutes", lockRemainingMinutes);
+        Map<String, Object> data = LoginResponseUtil.createLockedData(lockRemainingMinutes);
 
         Response<Map<String, Object>> resp = Response.fail(
                 ResponseCodeEnum.ACCOUNT_LOCKED.getErrorCode(),

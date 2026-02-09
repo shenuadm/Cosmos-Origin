@@ -1,8 +1,11 @@
 package com.cosmos.origin.web.filter;
 
+import com.cosmos.origin.admin.enums.LoginStatusEnum;
 import com.cosmos.origin.admin.service.LoginAttemptService;
+import com.cosmos.origin.admin.service.LoginLogService;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.utils.Response;
+import com.cosmos.origin.jwt.utils.LoginResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,6 +37,7 @@ import java.util.Map;
 public class LoginAttemptCheckFilter extends OncePerRequestFilter {
 
     private final LoginAttemptService loginAttemptService;
+    private final LoginLogService loginLogService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -49,6 +52,10 @@ public class LoginAttemptCheckFilter extends OncePerRequestFilter {
                     long lockRemainingMinutes = loginAttemptService.getLockRemainingMinutes(username);
 
                     log.warn("用户 [{}] 尝试登录，但账号已被锁定，剩余锁定时间: {} 分钟", username, lockRemainingMinutes);
+
+                    // 记录锁定状态的登录日志
+                    String message = String.format("登录失败次数过多，账号已被锁定，请 %d 分钟后重试", lockRemainingMinutes);
+                    loginLogService.recordLoginLog(username, LoginStatusEnum.LOCKED, message, request);
 
                     // 直接返回锁定响应
                     writeLockedResponse(response, lockRemainingMinutes);
@@ -70,12 +77,7 @@ public class LoginAttemptCheckFilter extends OncePerRequestFilter {
 
         String message = String.format("登录失败次数过多，账号已被锁定，请 %d 分钟后重试", lockRemainingMinutes);
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("currentAttempts", 0);
-        data.put("maxAttempts", 5);
-        data.put("remainingAttempts", 0);
-        data.put("locked", true);
-        data.put("lockRemainingMinutes", lockRemainingMinutes);
+        Map<String, Object> data = LoginResponseUtil.createLockedData(lockRemainingMinutes);
         data.put("message", message);
 
         Response<Map<String, Object>> resp = Response.fail(

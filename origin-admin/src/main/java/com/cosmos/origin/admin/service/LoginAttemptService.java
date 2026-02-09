@@ -2,6 +2,7 @@ package com.cosmos.origin.admin.service;
 
 import com.cosmos.origin.admin.domain.dos.UserDO;
 import com.cosmos.origin.admin.domain.mapper.UserMapper;
+import com.cosmos.origin.jwt.utils.LoginResponseUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -9,7 +10,6 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -183,12 +183,7 @@ public class LoginAttemptService {
      * @return 锁定信息 Map
      */
     private Map<String, Object> createLockedInfo(long lockRemainingMinutes) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("currentAttempts", 0);
-        result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
-        result.put("remainingAttempts", 0);
-        result.put("locked", true);
-        result.put("lockRemainingMinutes", lockRemainingMinutes);
+        Map<String, Object> result = LoginResponseUtil.createLockedData(lockRemainingMinutes);
         result.put("message", String.format("登录失败次数过多，账号已被锁定，请 %d 分钟后重试", lockRemainingMinutes));
         return result;
     }
@@ -210,12 +205,7 @@ public class LoginAttemptService {
         int currentAttempts = getCurrentAttempts(username);
         int remainingAttempts = Math.max(0, DEFAULT_MAX_ATTEMPTS - currentAttempts);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("currentAttempts", currentAttempts);
-        result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
-        result.put("remainingAttempts", remainingAttempts);
-        result.put("locked", false);
-        result.put("lockRemainingMinutes", 0);
+        Map<String, Object> result = LoginResponseUtil.createAttemptData(currentAttempts, remainingAttempts);
         result.put("message", String.format("登录失败，这是第 %d 次尝试，还有 %d 次机会，超过 %d 次后账号将被锁定 30 分钟",
                 currentAttempts, remainingAttempts, DEFAULT_MAX_ATTEMPTS));
 
