@@ -101,7 +101,7 @@ public class WebSecurityConfig {
                             // 获取尝试信息并保存到 request，供失败处理器使用
                             Map<String, Object> attemptInfoMap = loginAttemptService.getAttemptInfoAfterFailure(username);
                             request.setAttribute("LOGIN_ATTEMPT_INFO_MAP", attemptInfoMap);
-                        } else if (loginAttemptService != null && isLockedExceptionType) {
+                        } else if (loginAttemptService != null) {
                             // 账号已锁定，直接获取锁定信息
                             Map<String, Object> attemptInfoMap = loginAttemptService.getAttemptInfoAfterFailure(username);
                             request.setAttribute("LOGIN_ATTEMPT_INFO_MAP", attemptInfoMap);
@@ -111,10 +111,10 @@ public class WebSecurityConfig {
                         if (loginLogService != null) {
                             // 判断账号是否已被锁定
                             boolean isLocked = loginAttemptService != null && loginAttemptService.isLocked(username);
-                            
+
                             LoginStatusEnum status;
                             String message;
-                            
+
                             if (isLocked) {
                                 // 账号已被锁定
                                 status = LoginStatusEnum.LOCKED;
@@ -126,7 +126,7 @@ public class WebSecurityConfig {
                                 message = exception instanceof org.springframework.security.authentication.BadCredentialsException
                                         ? "用户名或密码错误" : exception.getMessage();
                             }
-                            
+
                             loginLogService.recordLoginLog(username, status, message, request);
                         }
                     });
