@@ -57,9 +57,11 @@ public class LoginAttemptService {
         UserDO user = userMapper.findByUsername(username);
         if (user == null) {
             // 用户不存在，仍然记录尝试次数（防止用户枚举攻击）
+            loginFailed(username);
         }
 
         // 可以扩展检查用户状态字段（如 accountLocked, enabled 等）
+
     }
 
     /**
@@ -159,7 +161,7 @@ public class LoginAttemptService {
     public long getLockRemainingMinutes(String username) {
         String lockedKey = LOGIN_LOCKED_KEY_PREFIX + username;
         Long ttl = redisTemplate.getExpire(lockedKey, TimeUnit.MINUTES);
-        return ttl != null ? Math.max(0, ttl) : 0;
+        return Math.max(0, ttl);
     }
 
     /**
@@ -175,30 +177,40 @@ public class LoginAttemptService {
     }
 
     /**
+     * 创建锁定状态的信息 Map
+     *
+     * @param lockRemainingMinutes 锁定剩余时间（分钟）
+     * @return 锁定信息 Map
+     */
+    private Map<String, Object> createLockedInfo(long lockRemainingMinutes) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("currentAttempts", 0);
+        result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
+        result.put("remainingAttempts", 0);
+        result.put("locked", true);
+        result.put("lockRemainingMinutes", lockRemainingMinutes);
+        result.put("message", String.format("登录失败次数过多，账号已被锁定，请 %d 分钟后重试", lockRemainingMinutes));
+        return result;
+    }
+
+    /**
      * 获取登录尝试详细信息（返回 Map，避免循环依赖）
      *
      * @param username 用户名
      * @return 登录尝试信息 Map
      */
     public Map<String, Object> getAttemptInfo(String username) {
-        Map<String, Object> result = new HashMap<>();
-
         // 检查是否被锁定
         if (isLocked(username)) {
             long lockRemainingMinutes = getLockRemainingMinutes(username);
-            result.put("currentAttempts", 0);
-            result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
-            result.put("remainingAttempts", 0);
-            result.put("locked", true);
-            result.put("lockRemainingMinutes", lockRemainingMinutes);
-            result.put("message", String.format("登录失败次数过多，账号已被锁定，请 %d 分钟后重试", lockRemainingMinutes));
-            return result;
+            return createLockedInfo(lockRemainingMinutes);
         }
 
         // 获取当前尝试次数
         int currentAttempts = getCurrentAttempts(username);
         int remainingAttempts = Math.max(0, DEFAULT_MAX_ATTEMPTS - currentAttempts);
 
+        Map<String, Object> result = new HashMap<>();
         result.put("currentAttempts", currentAttempts);
         result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
         result.put("remainingAttempts", remainingAttempts);
@@ -217,32 +229,7 @@ public class LoginAttemptService {
      * @return 登录尝试信息 Map
      */
     public Map<String, Object> getAttemptInfoAfterFailure(String username) {
-        // 检查是否被锁定（刚被锁定的情况）
-        if (isLocked(username)) {
-            long lockRemainingMinutes = getLockRemainingMinutes(username);
-            Map<String, Object> result = new HashMap<>();
-            result.put("currentAttempts", 0);
-            result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
-            result.put("remainingAttempts", 0);
-            result.put("locked", true);
-            result.put("lockRemainingMinutes", lockRemainingMinutes);
-            result.put("message", String.format("登录失败次数过多，账号已被锁定，请 %d 分钟后重试", lockRemainingMinutes));
-            return result;
-        }
-
-        // 获取当前尝试次数（已经+1了）
-        int currentAttempts = getCurrentAttempts(username);
-        int remainingAttempts = Math.max(0, DEFAULT_MAX_ATTEMPTS - currentAttempts);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("currentAttempts", currentAttempts);
-        result.put("maxAttempts", DEFAULT_MAX_ATTEMPTS);
-        result.put("remainingAttempts", remainingAttempts);
-        result.put("locked", false);
-        result.put("lockRemainingMinutes", 0);
-        result.put("message", String.format("登录失败，这是第 %d 次尝试，还有 %d 次机会，超过 %d 次后账号将被锁定 30 分钟",
-                currentAttempts, remainingAttempts, DEFAULT_MAX_ATTEMPTS));
-
-        return result;
+        // 直接调用 getAttemptInfo 方法，逻辑完全相同
+        return getAttemptInfo(username);
     }
 }

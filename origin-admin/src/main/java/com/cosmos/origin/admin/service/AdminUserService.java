@@ -51,4 +51,12 @@ public interface AdminUserService {
      * @return {@link Response }<{@link ? }> 删除用户结果
      */
     Response<?> deleteUser(DeleteUserReqVO deleteUserReqVO);
+
+    /**
+     * 手动解锁用户账号（管理员使用）
+     *
+     * @param unlockUserReqVO 解锁用户请求参数
+     * @return {@link Response }<{@link ? }> 解锁结果
+     */
+    Response<?> unlockUser(UnlockUserReqVO unlockUserReqVO);
 }

@@ -7,6 +7,7 @@ import com.cosmos.origin.common.utils.PageResponse;
 import com.cosmos.origin.common.utils.Response;
 import com.cosmos.origin.admin.model.vo.user.*;
 import com.cosmos.origin.admin.service.AdminUserService;
+import com.cosmos.origin.admin.service.LoginAttemptService;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final LoginAttemptService loginAttemptService;
 
     /**
      * 修改密码
@@ -157,5 +159,27 @@ public class AdminUserServiceImpl implements AdminUserService {
     public Response<?> deleteUser(DeleteUserReqVO deleteUserReqVO) {
         int delete = userMapper.deleteById(deleteUserReqVO.getId());
         return delete == 1 ? Response.success() : Response.fail();
+    }
+
+    /**
+     * 手动解锁用户账号（管理员使用）
+     *
+     * @param unlockUserReqVO 解锁用户请求参数
+     * @return {@link Response }<{@link ? }> 解锁结果
+     */
+    @Override
+    public Response<?> unlockUser(UnlockUserReqVO unlockUserReqVO) {
+        String username = unlockUserReqVO.getUsername();
+
+        // 验证用户是否存在
+        UserDO user = userMapper.findByUsername(username);
+        if (user == null) {
+            return Response.fail(ResponseCodeEnum.USERNAME_NOT_FOUND);
+        }
+
+        // 调用 LoginAttemptService 解锁账号
+        loginAttemptService.unlock(username);
+
+        return Response.success("用户 [" + username + "] 账号已成功解锁");
     }
 }

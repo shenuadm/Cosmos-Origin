@@ -60,4 +60,11 @@ public class AdminUserController {
     public Response<?> deleteUser(@RequestBody @Validated DeleteUserReqVO deleteUserReqVO) {
         return userService.deleteUser(deleteUserReqVO);
     }
+
+    @PostMapping("/user/unlock")
+    @Operation(summary = "手动解锁用户账号（管理员使用）")
+    @ApiOperationLog(description = "手动解锁用户账号")
+    public Response<?> unlockUser(@RequestBody @Validated UnlockUserReqVO unlockUserReqVO) {
+        return userService.unlockUser(unlockUserReqVO);
+    }
 }
