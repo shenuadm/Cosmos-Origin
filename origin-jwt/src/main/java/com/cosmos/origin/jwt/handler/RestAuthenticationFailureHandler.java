@@ -77,7 +77,6 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
         data.put("remainingAttempts", 0);
         data.put("locked", true);
         data.put("lockRemainingMinutes", lockRemainingMinutes);
-        data.put("message", message);
 
         Response<Map<String, Object>> resp = Response.fail(
                 ResponseCodeEnum.ACCOUNT_LOCKED.getErrorCode(),
@@ -99,7 +98,6 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
             data.put("remainingAttempts", attemptInfoMap.get("remainingAttempts"));
             data.put("locked", attemptInfoMap.get("locked"));
             data.put("lockRemainingMinutes", attemptInfoMap.get("lockRemainingMinutes"));
-            data.put("message", attemptInfoMap.get("message"));
 
             Response<Map<String, Object>> resp = Response.fail(
                     ResponseCodeEnum.USERNAME_OR_PWD_ERROR.getErrorCode(),
