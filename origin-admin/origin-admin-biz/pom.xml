@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>com.cosmos</groupId>
-            <artifactId>origin-oss</artifactId>
+            <artifactId>origin-oss-spring-boot-starter</artifactId>
         </dependency>
 
         <!-- MyBatis-Flex -->
