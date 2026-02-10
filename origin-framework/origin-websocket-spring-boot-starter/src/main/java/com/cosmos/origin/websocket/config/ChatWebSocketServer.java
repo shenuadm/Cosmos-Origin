@@ -10,7 +10,6 @@ import com.cosmos.origin.websocket.utils.SpringContext;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -28,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author 一陌千尘
  * @date 2026/02/10
  */
-@Component
 @Slf4j
 @ServerEndpoint("/ws/chat")
 public class ChatWebSocketServer {

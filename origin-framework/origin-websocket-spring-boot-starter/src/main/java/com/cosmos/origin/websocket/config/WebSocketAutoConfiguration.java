@@ -1,8 +1,10 @@
 package com.cosmos.origin.websocket.config;
 
+import com.cosmos.origin.websocket.utils.SpringContext;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
@@ -13,6 +15,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
  */
 @Configuration
 @ConditionalOnWebApplication
+@Import(ChatWebSocketServer.class)
 public class WebSocketAutoConfiguration {
 
     /**
@@ -25,10 +28,11 @@ public class WebSocketAutoConfiguration {
     }
 
     /**
-     * 注册 ChatWebSocketServer 端点
+     * 注册 SpringContext 工具类
+     * 用于在 WebSocket 端点中获取 Spring 容器中的 Bean
      */
     @Bean
-    public ChatWebSocketServer chatWebSocketServer() {
-        return new ChatWebSocketServer();
+    public SpringContext springContext() {
+        return new SpringContext();
     }
 }
