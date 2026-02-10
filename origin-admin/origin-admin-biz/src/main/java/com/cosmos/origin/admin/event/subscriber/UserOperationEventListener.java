@@ -24,7 +24,7 @@ public class UserOperationEventListener {
     public void handleUserOperationSync(UserOperationEvent event) {
         UserOperationEvent.UserOperationData data = event.getData();
         log.info("【同步处理】用户操作事件 - 用户ID: {}, 用户名: {}, 操作类型: {}, 描述: {}",
-                data.getUserId(), data.getUsername(), data.getOperationType(), data.getDescription());
+                data.userId(), data.username(), data.operationType(), data.description());
 
         // 这里可以添加同步处理逻辑，例如：
         // 1. 数据校验
@@ -44,7 +44,7 @@ public class UserOperationEventListener {
         UserOperationEvent.UserOperationData data = event.getData();
         log.info("【异步处理】用户操作事件 - 线程: {}, 用户ID: {}, 用户名: {}, 操作类型: {}, 描述: {}",
                 Thread.currentThread().getName(),
-                data.getUserId(), data.getUsername(), data.getOperationType(), data.getDescription());
+                data.userId(), data.username(), data.operationType(), data.description());
 
         try {
             // 模拟耗时操作
@@ -57,10 +57,10 @@ public class UserOperationEventListener {
             // 4. 调用第三方服务
             // 5. 缓存更新
 
-            log.info("【异步处理完成】用户操作事件处理成功 - 用户ID: {}", data.getUserId());
+            log.info("【异步处理完成】用户操作事件处理成功 - 用户ID: {}", data.userId());
         } catch (Exception e) {
             log.error("【异步处理失败】用户操作事件处理异常 - 用户ID: {}, 错误信息: {}",
-                    data.getUserId(), e.getMessage(), e);
+                    data.userId(), e.getMessage(), e);
         }
     }
 }

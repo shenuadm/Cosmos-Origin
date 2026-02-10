@@ -16,34 +16,12 @@ public class UserOperationEvent extends BaseEvent<UserOperationEvent.UserOperati
 
     /**
      * 用户操作数据
+     *
+     * @param userId        用户 ID
+     * @param username      用户名
+     * @param operationType 操作类型（如：CREATE, UPDATE, DELETE）
+     * @param description   操作描述
      */
-    @Getter
-    public static class UserOperationData {
-        /**
-         * 用户 ID
-         */
-        private final Long userId;
-
-        /**
-         * 用户名
-         */
-        private final String username;
-
-        /**
-         * 操作类型（如：CREATE, UPDATE, DELETE）
-         */
-        private final String operationType;
-
-        /**
-         * 操作描述
-         */
-        private final String description;
-
-        public UserOperationData(Long userId, String username, String operationType, String description) {
-            this.userId = userId;
-            this.username = username;
-            this.operationType = operationType;
-            this.description = description;
-        }
+    public record UserOperationData(Long userId, String username, String operationType, String description) {
     }
 }

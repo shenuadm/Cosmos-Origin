@@ -2,14 +2,12 @@ package com.cosmos.origin.admin.service.impl;
 
 import com.cosmos.origin.admin.domain.dos.UserDO;
 import com.cosmos.origin.admin.domain.mapper.UserMapper;
-import com.cosmos.origin.admin.event.UserOperationEvent;
 import com.cosmos.origin.admin.model.vo.user.*;
 import com.cosmos.origin.admin.service.AdminUserService;
 import com.cosmos.origin.admin.service.LoginAttemptService;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.utils.PageResponse;
 import com.cosmos.origin.common.utils.Response;
-import com.cosmos.origin.event.publisher.EventPublisher;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +27,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final LoginAttemptService loginAttemptService;
-    private final EventPublisher eventPublisher;
+    // private final EventPublisher eventPublisher;
 
     /**
      * 修改密码
@@ -134,15 +132,15 @@ public class AdminUserServiceImpl implements AdminUserService {
         int insert = userMapper.insert(userDO);
 
         // 发布用户创建事件（演示事件发布）
-        if (insert == 1) {
-            UserOperationEvent.UserOperationData data = new UserOperationEvent.UserOperationData(
-                    userDO.getId(), // 用户ID，实际应该从数据库获取新增后的ID
-                    addUserReqVO.getUsername(),
-                    "CREATE",
-                    "管理员创建新用户: " + addUserReqVO.getUsername()
-            );
-            eventPublisher.publishEvent(new UserOperationEvent(this, data));
-        }
+        // if (insert == 1) {
+        //     UserOperationEvent.UserOperationData data = new UserOperationEvent.UserOperationData(
+        //             userDO.getId(), // 用户ID，实际应该从数据库获取新增后的ID
+        //             addUserReqVO.getUsername(),
+        //             "CREATE",
+        //             "管理员创建新用户: " + addUserReqVO.getUsername()
+        //     );
+        //     eventPublisher.publishEvent(new UserOperationEvent(this, data));
+        // }
 
         return insert == 1 ? Response.success() : Response.fail();
     }
@@ -174,20 +172,20 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public Response<?> deleteUser(DeleteUserReqVO deleteUserReqVO) {
         // 先查询用户信息
-        UserDO user = userMapper.selectOneById(deleteUserReqVO.getId());
+        // UserDO user = userMapper.selectOneById(deleteUserReqVO.getId());
 
         int delete = userMapper.deleteById(deleteUserReqVO.getId());
 
         // 发布用户删除事件（演示事件发布）
-        if (delete == 1 && user != null) {
-            UserOperationEvent.UserOperationData data = new UserOperationEvent.UserOperationData(
-                    user.getId(),
-                    user.getUsername(),
-                    "DELETE",
-                    "管理员删除用户: " + user.getUsername()
-            );
-            eventPublisher.publishEvent(new UserOperationEvent(this, data));
-        }
+        // if (delete == 1 && user != null) {
+        //     UserOperationEvent.UserOperationData data = new UserOperationEvent.UserOperationData(
+        //             user.getId(),
+        //             user.getUsername(),
+        //             "DELETE",
+        //             "管理员删除用户: " + user.getUsername()
+        //     );
+        //     eventPublisher.publishEvent(new UserOperationEvent(this, data));
+        // }
 
         return delete == 1 ? Response.success() : Response.fail();
     }
