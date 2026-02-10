@@ -1,6 +1,7 @@
 package com.cosmos.origin.jwt.handler;
 
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
+import com.cosmos.origin.common.exception.BizException;
 import com.cosmos.origin.common.utils.Response;
 import com.cosmos.origin.jwt.exception.UsernameOrPasswordNullException;
 import com.cosmos.origin.jwt.utils.LoginResponseUtil;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -54,6 +56,15 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
             // 用户名或密码错误
             handleBadCredentialsResponse(response, attemptInfoMap);
             return;
+        }
+
+        // 处理内部认证服务异常（如 BizException 被包装的情况）
+        if (exception instanceof InternalAuthenticationServiceException) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof BizException bizException) {
+                ResultUtil.fail(response, Response.fail(bizException.getErrorCode(), bizException.getErrorMessage()));
+                return;
+            }
         }
 
         // 其他登录失败情况
