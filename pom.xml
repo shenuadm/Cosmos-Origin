@@ -27,9 +27,7 @@
         <module>origin-jwt</module>
         <!-- 认证服务 -->
         <module>origin-auth</module>
-        <!-- 管理后台 API 模块 -->
-        <module>origin-admin-api</module>
-        <!-- 管理后台 -->
+        <!-- 管理后台聚合模块 -->
         <module>origin-admin</module>
         <!-- 入口模块 -->
         <module>origin-web</module>
@@ -100,7 +98,7 @@
 
             <dependency>
                 <groupId>com.cosmos</groupId>
-                <artifactId>origin-admin</artifactId>
+                <artifactId>origin-admin-biz</artifactId>
                 <version>${revision}</version>
             </dependency>
 

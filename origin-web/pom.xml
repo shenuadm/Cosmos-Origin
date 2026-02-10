@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>com.cosmos</groupId>
-            <artifactId>origin-admin</artifactId>
+            <artifactId>origin-admin-biz</artifactId>
         </dependency>
 
         <dependency>
