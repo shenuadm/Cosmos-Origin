@@ -1,34 +1,24 @@
 package com.cosmos.origin.websocket.model.vo.chatroom;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 在线用户
- *
- * @author 一陌千尘
- * @date 2026/02/10
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Schema(name = "在线用户信息")
 public class OnlineUserVO {
 
-    /**
-     * 昵称
-     */
+    @Schema(description = "昵称")
     private String nickname;
 
-    /**
-     * 头像
-     */
+    @Schema(description = "头像")
     private String avatar;
 
-    /**
-     * 是否在线
-     */
+    @Schema(description = "是否在线")
     private Boolean online;
 }

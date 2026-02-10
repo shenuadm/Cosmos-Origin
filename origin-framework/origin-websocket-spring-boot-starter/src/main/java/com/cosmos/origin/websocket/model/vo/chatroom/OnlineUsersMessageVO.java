@@ -1,5 +1,6 @@
 package com.cosmos.origin.websocket.model.vo.chatroom;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,30 +8,19 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * 在线用户列表消息
- *
- * @author 一陌千尘
- * @date 2026/02/10
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Schema(name = "在线用户列表消息")
 public class OnlineUsersMessageVO {
 
-    /**
-     * 消息类型
-     */
+    @Schema(description = "消息类型")
     private Integer type;
 
-    /**
-     * 在线用户列表
-     */
+    @Schema(description = "在线用户列表")
     private List<OnlineUserVO> users;
 
-    /**
-     * 在线人数
-     */
+    @Schema(description = "在线人数")
     private Integer onlineCount;
 }

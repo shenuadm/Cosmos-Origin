@@ -1,29 +1,21 @@
 package com.cosmos.origin.websocket.model.vo.chatroom;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 用户信息
- *
- * @author 一陌千尘
- * @date 2026/02/10
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Schema(name = "用户信息")
 public class UserInfoVO {
 
-    /**
-     * 昵称
-     */
+    @Schema(description = "昵称")
     private String nickname;
 
-    /**
-     * 头像
-     */
+    @Schema(description = "头像")
     private String avatar;
 }

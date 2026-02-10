@@ -1,54 +1,36 @@
 package com.cosmos.origin.websocket.model.vo.chatroom;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 聊天室消息
- *
- * @author 一陌千尘
- * @date 2026/02/10
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Schema(name = "聊天室消息")
 public class ChatMessageVO {
 
-    /**
-     * 消息 ID
-     */
+    @Schema(description = "消息 ID")
     private Long id;
 
-    /**
-     * 消息类型
-     */
+    @Schema(description = "消息类型：0-系统消息，1-聊天消息，2-在线用户列表消息")
     private Integer type;
 
-    /**
-     * 昵称
-     */
+    @Schema(description = "昵称")
     private String nickname;
 
-    /**
-     * 头像
-     */
+    @Schema(description = "头像")
     private String avatar;
 
-    /**
-     * 消息内容
-     */
+    @Schema(description = "消息内容")
     private String content;
 
-    /**
-     * 发送时间
-     */
+    @Schema(description = "发送时间")
     private String time;
 
-    /**
-     * 在线人数
-     */
+    @Schema(description = "在线人数")
     private Integer onlineCount;
 }
