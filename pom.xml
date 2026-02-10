@@ -112,7 +112,7 @@
 
             <dependency>
                 <groupId>com.cosmos</groupId>
-                <artifactId>origin-biz-operationlog-spring-boot-starter</artifactId>
+                <artifactId>origin-operationlog-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
 
