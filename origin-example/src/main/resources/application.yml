@@ -1,0 +1,36 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: origin-example
+
+# 定时任务线程池配置
+origin:
+  scheduler:
+    thread-pool:
+      pool-size: 5                                # 定时任务线程池大小
+      thread-name-prefix: "example-scheduler-"    # 线程名前缀
+      wait-for-tasks-to-complete-on-shutdown: true # 是否等待任务完成后再关闭线程池
+      await-termination-seconds: 60 # 等待任务完成后再关闭线程池的超时时间
+
+  # 事件驱动线程池配置
+  event:
+    thread-pool:
+      core-pool-size: 4                           # 核心线程数
+      max-pool-size: 8                            # 最大线程数
+      queue-capacity: 100                         # 队列容量
+      keep-alive-seconds: 60                      # 线程空闲时间
+      thread-name-prefix: "example-event-"        # 线程名前缀
+      wait-for-tasks-to-complete-on-shutdown: true # 是否等待任务完成后再关闭线程池
+      await-termination-seconds: 60                # 等待任务完成后再关闭线程池的超时时间
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.cosmos.origin.example: DEBUG
+    com.cosmos.origin.scheduler: DEBUG
+    com.cosmos.origin.event: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

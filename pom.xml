@@ -31,6 +31,8 @@
         <module>origin-admin</module>
         <!-- 入口模块 -->
         <module>origin-web</module>
+        <!-- 示例模块 -->
+        <module>origin-example</module>
     </modules>
 
     <!-- 版本号统一管理 -->
@@ -135,6 +137,18 @@
             <dependency>
                 <groupId>com.cosmos</groupId>
                 <artifactId>origin-event-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmos</groupId>
+                <artifactId>origin-scheduler-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmos</groupId>
+                <artifactId>origin-example</artifactId>
                 <version>${revision}</version>
             </dependency>
 
