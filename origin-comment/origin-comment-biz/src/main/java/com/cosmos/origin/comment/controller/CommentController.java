@@ -1,6 +1,7 @@
 package com.cosmos.origin.comment.controller;
 
 import com.cosmos.origin.biz.operationlog.aspect.ApiOperationLog;
+import com.cosmos.origin.comment.model.vo.FindCommentListReqVO;
 import com.cosmos.origin.comment.model.vo.PublishCommentReqVO;
 import com.cosmos.origin.comment.service.CommentService;
 import com.cosmos.origin.common.utils.Response;
@@ -26,5 +27,12 @@ public class CommentController {
     @ApiOperationLog(description = "发布评论")
     public Response<?> publishComment(@RequestBody @Validated PublishCommentReqVO publishCommentReqVO) {
         return commentService.publishComment(publishCommentReqVO);
+    }
+
+    @PostMapping("/list")
+    @Operation(summary = "获取页面所有评论")
+    @ApiOperationLog(description = "获取页面所有评论")
+    public Response<?> findPageComments(@RequestBody @Validated FindCommentListReqVO findCommentListReqVO) {
+        return commentService.findCommentList(findCommentListReqVO);
     }
 }

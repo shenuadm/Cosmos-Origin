@@ -28,6 +28,8 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     USER_NOT_ROLE("20006", "该用户尚未分配角色，请联系管理员分配角色！"),
     ACCOUNT_LOCKED("20007", "登录失败次数过多，账号已被锁定"),
     FILE_UPLOAD_FAILED("20008", "文件上传失败！"),
+    COMMENT_CONTAIN_SENSITIVE_WORD("20009", "评论内容中包含敏感词，请重新编辑后再提交"),
+    COMMENT_WAIT_EXAMINE("20010", "评论已提交, 等待博主审核通过"),
     ;
 
     // 异常码

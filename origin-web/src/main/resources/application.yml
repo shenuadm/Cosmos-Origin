@@ -78,7 +78,6 @@ springdoc:
       paths-to-match: '/**'
       packages-to-scan:
         # 指定扫描的包
-        - com.cosmos.origin.web.controller
         - com.cosmos.origin.admin.controller
         - com.cosmos.origin.websocket.controller
         - com.cosmos.origin.comment.controller
