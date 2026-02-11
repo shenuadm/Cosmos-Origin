@@ -33,7 +33,7 @@ public class CommentDO extends BaseEntity {
     private String nickname;
 
     /**
-     * 登录用户名
+     * 登录账号
      */
     private String username;
 

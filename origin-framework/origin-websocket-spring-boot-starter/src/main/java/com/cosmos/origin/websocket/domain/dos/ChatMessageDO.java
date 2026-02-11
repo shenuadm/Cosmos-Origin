@@ -27,7 +27,7 @@ public class ChatMessageDO {
     private Long id;
 
     /**
-     * 登录用户名
+     * 登录账号
      */
     private String username;
 

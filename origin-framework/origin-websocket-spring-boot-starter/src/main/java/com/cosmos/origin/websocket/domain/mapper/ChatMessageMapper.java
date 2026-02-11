@@ -36,11 +36,8 @@ public interface ChatMessageMapper extends BaseMapper<ChatMessageDO> {
      * @return 聊天消息
      */
     default List<ChatMessageDO> selectMessagesBefore(Long lastId, int limit) {
-        QueryWrapper queryWrapper = QueryWrapper.create();
-        if (Objects.nonNull(lastId)) {
-            queryWrapper.lt(ChatMessageDO::getId, lastId); // 过滤出小于 lastId 的记录
-        }
-        return selectListByQuery(queryWrapper
+        return selectListByQuery(QueryWrapper.create()
+                .lt(ChatMessageDO::getId, lastId, Objects.nonNull(lastId))
                 .orderBy(ChatMessageDO::getCreateTime, false) // 按创建时间倒序
                 .limit(limit)); // 添加 limit
     }

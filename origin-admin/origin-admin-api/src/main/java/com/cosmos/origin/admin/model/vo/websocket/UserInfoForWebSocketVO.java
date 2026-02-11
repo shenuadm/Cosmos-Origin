@@ -22,7 +22,7 @@ public class UserInfoForWebSocketVO {
     @Schema(description = "用户 ID")
     private Long id;
 
-    @Schema(description = "登录用户名")
+    @Schema(description = "登录账号")
     private String username;
 
     @Schema(description = "昵称")

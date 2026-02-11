@@ -3,12 +3,11 @@ package com.cosmos.origin.comment.service.impl;
 import com.cosmos.origin.comment.domain.dos.CommentDO;
 import com.cosmos.origin.comment.domain.mapper.CommentMapper;
 import com.cosmos.origin.comment.enums.CommentStatusEnum;
-import com.cosmos.origin.comment.model.vo.FindCommentItemRspVO;
-import com.cosmos.origin.comment.model.vo.FindCommentListReqVO;
-import com.cosmos.origin.comment.model.vo.FindCommentListRspVO;
-import com.cosmos.origin.comment.model.vo.PublishCommentReqVO;
+import com.cosmos.origin.comment.model.vo.*;
 import com.cosmos.origin.comment.service.CommentService;
+import com.cosmos.origin.common.utils.PageResponse;
 import com.cosmos.origin.common.utils.Response;
+import com.mybatisflex.core.paginate.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import toolgood.words.WordsSearch;
 import toolgood.words.WordsSearchResult;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -175,5 +175,47 @@ public class CommentServiceImpl implements CommentService {
                 .total(total)
                 .comments(vos)
                 .build());
+    }
+
+    /**
+     * 查询评论分页数据
+     *
+     * @param findCommentPageListReqVO 查询评论分页数据请求参数
+     * @return 查询评论分页数据响应结果
+     */
+    @Override
+    public Response<?> findCommentPageList(FindCommentPageListReqVO findCommentPageListReqVO) {
+        // 获取当前页、以及每页需要展示的数据数量
+        Long current = findCommentPageListReqVO.getCurrent();
+        Long size = findCommentPageListReqVO.getSize();
+        LocalDate startDate = findCommentPageListReqVO.getStartDate();
+        LocalDate endDate = findCommentPageListReqVO.getEndDate();
+        String routerUrl = findCommentPageListReqVO.getRouterUrl();
+        Integer status = findCommentPageListReqVO.getStatus();
+
+        // 执行分页查询
+        Page<CommentDO> commentDOPage = commentMapper.selectPageList(current, size, routerUrl, startDate, endDate, status);
+
+        List<CommentDO> commentDOS = commentDOPage.getRecords();
+
+        // DO 转 VO
+        List<FindCommentPageListRspVO> vos = null;
+        if (!CollectionUtils.isEmpty(commentDOS)) {
+            vos = commentDOS.stream()
+                    .map(commentDO -> FindCommentPageListRspVO.builder()
+                            .id(commentDO.getId())
+                            .routerUrl(commentDO.getRouterUrl())
+                            .avatar(commentDO.getAvatar())
+                            .nickname(commentDO.getNickname())
+                            .username(commentDO.getUsername())
+                            .createTime(commentDO.getCreateTime())
+                            .content(commentDO.getContent())
+                            .status(commentDO.getStatus())
+                            .reason(commentDO.getReason())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        return PageResponse.success(commentDOPage, vos);
     }
 }
