@@ -17,5 +17,4 @@ public class FindCommentListReqVO {
     @Schema(description = "路由地址", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "路由地址不能为空")
     private String routerUrl;
-
 }
