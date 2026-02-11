@@ -81,6 +81,17 @@ springdoc:
         - com.cosmos.origin.web.controller
         - com.cosmos.origin.admin.controller
         - com.cosmos.origin.websocket.controller
+        - com.cosmos.origin.comment.controller
+# 评论功能配置
+comment:
+  examine:
+    # 是否开启评论审核功能（true: 开启, false: 关闭）
+    open: false
+  sensi:
+    word:
+      # 是否开启敏感词过滤功能（true: 开启, false: 关闭）
+      open: false
+
 # knife4j 增强配置
 knife4j:
   enable: true

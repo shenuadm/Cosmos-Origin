@@ -31,6 +31,11 @@
 
         <dependency>
             <groupId>com.cosmos</groupId>
+            <artifactId>origin-comment-biz</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cosmos</groupId>
             <artifactId>origin-jwt</artifactId>
         </dependency>
 

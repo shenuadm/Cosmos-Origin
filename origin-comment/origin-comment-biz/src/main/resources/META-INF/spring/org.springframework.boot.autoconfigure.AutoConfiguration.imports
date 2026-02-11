@@ -1,2 +1,2 @@
-com.cosmos.origin.admin.config.CommentMybatisFlexAutoConfiguration
-com.cosmos.origin.admin.config.CommentAutoConfiguration
+com.cosmos.origin.comment.config.CommentMybatisFlexAutoConfiguration
+com.cosmos.origin.comment.config.CommentAutoConfiguration
