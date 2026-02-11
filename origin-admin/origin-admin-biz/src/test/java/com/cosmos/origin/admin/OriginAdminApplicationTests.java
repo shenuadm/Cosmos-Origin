@@ -1,13 +1,12 @@
-package com.cosmos.origin.common;
+package com.cosmos.origin.admin;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OriginModuleCommonApplicationTests {
+class OriginAdminApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }

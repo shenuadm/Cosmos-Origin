@@ -38,5 +38,5 @@ spring:
 minio:
   endpoint: http://127.0.0.1:9000
   accessKey: minioAdmin
-  secretKey: Wzw@0627
+  secretKey: wzw123!@#
   bucketName: origin

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!-- 指定父项目为 origin-springboot -->
+    <parent>
+        <groupId>com.cosmos</groupId>
+        <artifactId>origin-springboot</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <!-- 多模块项目需要配置打包方式为 pom -->
+    <packaging>pom</packaging>
+
+    <artifactId>origin-comment</artifactId>
+    <name>${project.artifactId}</name>
+    <description>评论模块聚合模块</description>
+
+    <modules>
+        <!-- 评论 API 接口定义 -->
+        <module>origin-comment-api</module>
+        <!-- 评论业务实现 -->
+        <module>origin-comment-biz</module>
+    </modules>
+
+</project>

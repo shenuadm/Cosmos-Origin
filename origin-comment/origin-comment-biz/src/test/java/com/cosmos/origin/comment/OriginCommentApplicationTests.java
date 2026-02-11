@@ -1,13 +1,12 @@
-package com.cosmos.origin.jwt;
+package com.cosmos.origin.comment;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OriginModuleJwtApplicationTests {
+class OriginCommentApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }
