@@ -64,8 +64,7 @@ public class ChatWebSocketServer {
         SESSION_MAP.put(sessionId, session);
 
         // 获取 Token，解析用户名
-        Map<String, List<String>> params = session.getRequestParameterMap();
-        String token = getFieldValueFromParam("token", params);
+        String token = getTokenFromSession(session);
         JwtTokenHelper jwtTokenHelper = SpringContext.getBean(JwtTokenHelper.class);
         String username = jwtTokenHelper.getUsernameByToken(token);
 
@@ -100,17 +99,16 @@ public class ChatWebSocketServer {
     }
 
     /**
-     * 获取对应参数
+     * 从 Session 中获取 Token
      *
-     * @param fieldName 字段名
-     * @param params    参数
-     * @return 对应参数的值
+     * @param session WebSocket Session
+     * @return Token 值
      */
-    private String getFieldValueFromParam(String fieldName, Map<String, List<String>> params) {
-        // 如果包含对应字段，且不为空，则取出
-        if (params.containsKey(fieldName)
-                && !CollectionUtils.isEmpty(params.get(fieldName))) {
-            return params.get(fieldName).get(0);
+    private String getTokenFromSession(Session session) {
+        Map<String, List<String>> params = session.getRequestParameterMap();
+        List<String> tokenList = params.get("token");
+        if (!CollectionUtils.isEmpty(tokenList)) {
+            return tokenList.get(0);
         }
         return null;
     }
@@ -186,8 +184,10 @@ public class ChatWebSocketServer {
             UserInfoVO userInfo = USER_INFO_MAP.get(sessionId);
             String nickname = Objects.nonNull(userInfo) ? userInfo.getNickname() : null;
 
-            // 删除对应会话
-            SESSION_MAP.remove(sessionId);
+            // 删除对应会话并确保资源关闭
+            Session removedSession = SESSION_MAP.remove(sessionId);
+            closeSessionQuietly(removedSession);
+
             // 删除用户信息
             USER_INFO_MAP.remove(sessionId);
 
@@ -200,6 +200,22 @@ public class ChatWebSocketServer {
             broadcastMessage(buildMessage(ChatRoomMessageTypeEnum.SYSTEM.getCode(), nickname, null, "离开了聊天室"));
             // 广播在线用户列表
             broadcastOnlineUsers();
+        }
+
+        // 确保传入的 Session 资源也被正确关闭
+        closeSessionQuietly(session);
+    }
+
+    /**
+     * 安静关闭 Session，不抛出异常
+     */
+    private void closeSessionQuietly(Session session) {
+        if (session != null && session.isOpen()) {
+            try {
+                session.close();
+            } catch (IOException e) {
+                log.error("## 关闭 WebSocket Session 失败：", e);
+            }
         }
     }
 
