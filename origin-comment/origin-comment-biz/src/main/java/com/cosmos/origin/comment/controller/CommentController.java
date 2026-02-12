@@ -3,6 +3,7 @@ package com.cosmos.origin.comment.controller;
 import com.cosmos.origin.biz.operationlog.aspect.ApiOperationLog;
 import com.cosmos.origin.comment.model.vo.*;
 import com.cosmos.origin.comment.service.CommentService;
+import com.cosmos.origin.common.utils.PageResponse;
 import com.cosmos.origin.common.utils.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,17 +29,17 @@ public class CommentController {
         return commentService.publishComment(publishCommentReqVO);
     }
 
-    @PostMapping("/list")
-    @Operation(summary = "获取页面所有评论")
-    @ApiOperationLog(description = "获取页面所有评论")
-    public Response<?> findPageComments(@RequestBody @Validated FindCommentListReqVO findCommentListReqVO) {
-        return commentService.findCommentList(findCommentListReqVO);
-    }
+    // @PostMapping("/list")
+    // @Operation(summary = "查询评论列表数据")
+    // @ApiOperationLog(description = "查询评论列表数据")
+    // public Response<?> findPageComments(@RequestBody @Validated FindCommentListReqVO findCommentListReqVO) {
+    //     return commentService.findCommentList(findCommentListReqVO);
+    // }
 
     @PostMapping("/page")
     @Operation(summary = "查询评论分页数据")
     @ApiOperationLog(description = "查询评论分页数据")
-    public Response<?> findCommentPageList(@RequestBody @Validated FindCommentPageListReqVO findCommentPageListReqVO) {
+    public PageResponse<?> findCommentPageList(@RequestBody @Validated FindCommentPageListReqVO findCommentPageListReqVO) {
         return commentService.findCommentPageList(findCommentPageListReqVO);
     }
 

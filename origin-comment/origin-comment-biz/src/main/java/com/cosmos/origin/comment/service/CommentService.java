@@ -1,6 +1,7 @@
 package com.cosmos.origin.comment.service;
 
 import com.cosmos.origin.comment.model.vo.*;
+import com.cosmos.origin.common.utils.PageResponse;
 import com.cosmos.origin.common.utils.Response;
 
 public interface CommentService {
@@ -14,7 +15,7 @@ public interface CommentService {
     Response<?> publishComment(PublishCommentReqVO publishCommentReqVO);
 
     /**
-     * 查询页面所有评论
+     * 查询评论列表数据
      *
      * @param findCommentListReqVO 查询评论列表请求参数
      * @return 查询评论列表响应结果
@@ -27,7 +28,7 @@ public interface CommentService {
      * @param findCommentPageListReqVO 查询评论分页数据请求参数
      * @return 查询评论分页数据响应结果
      */
-    Response<?> findCommentPageList(FindCommentPageListReqVO findCommentPageListReqVO);
+    PageResponse<?> findCommentPageList(FindCommentPageListReqVO findCommentPageListReqVO);
 
     /**
      * 删除评论

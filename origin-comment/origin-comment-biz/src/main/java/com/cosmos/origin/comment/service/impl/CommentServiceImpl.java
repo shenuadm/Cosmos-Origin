@@ -110,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * 查询页面所有评论
+     * 查询评论列表数据
      *
      * @param findCommentListReqVO 查询评论列表请求参数
      * @return 查询评论列表响应结果
@@ -187,7 +187,7 @@ public class CommentServiceImpl implements CommentService {
      * @return 查询评论分页数据响应结果
      */
     @Override
-    public Response<?> findCommentPageList(FindCommentPageListReqVO findCommentPageListReqVO) {
+    public PageResponse<?> findCommentPageList(FindCommentPageListReqVO findCommentPageListReqVO) {
         // 获取当前页、以及每页需要展示的数据数量
         Long current = findCommentPageListReqVO.getCurrent();
         Long size = findCommentPageListReqVO.getSize();
