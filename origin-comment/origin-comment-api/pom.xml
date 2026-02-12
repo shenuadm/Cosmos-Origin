@@ -38,10 +38,11 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- OpenAPI/Swagger 注解 -->
+        <!-- OpenAPI/Swagger 注解（仅编译期使用，运行时由 origin-web 的 Knife4j 提供） -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-common</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

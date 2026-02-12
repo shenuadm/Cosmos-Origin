@@ -22,7 +22,7 @@
 
         <dependency>
             <groupId>com.cosmos</groupId>
-            <artifactId>origin-jwt</artifactId>
+            <artifactId>origin-jwt-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -51,6 +51,13 @@
         <dependency>
             <groupId>com.mybatis-flex</groupId>
             <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!-- SpringDoc OpenAPI 注解（仅编译期使用，运行时由 origin-web 的 Knife4j 提供） -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

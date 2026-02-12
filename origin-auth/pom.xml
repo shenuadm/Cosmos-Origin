@@ -24,7 +24,7 @@
 
         <dependency>
             <groupId>com.cosmos</groupId>
-            <artifactId>origin-jwt</artifactId>
+            <artifactId>origin-jwt-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>

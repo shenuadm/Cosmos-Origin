@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/origin?serverTimezone=Asia/Shanghai
-    username: root
-    password: wzw123!@#
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:wzw123!@#}
     hikari:
       minimum-idle: 5 # 连接池中最小空闲连接数
       maximum-pool-size: 20 # 连接池中允许的最大连接数
@@ -18,9 +18,9 @@ spring:
   # 如果 Redis 未启动，请使用 docker run -d --name redis -p 6379:6379 redis:latest 启动
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      password: wzw123!@# # 如果 Redis 设置了密码，在此填写
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      # password: ${REDIS_PASSWORD:wzw123!@#} # 如果 Redis 设置了密码，在此填写
       database: 0
       lettuce:
         pool:
@@ -50,7 +50,7 @@ origin:
 # minio
 #=================================================================
 minio:
-  endpoint: http://127.0.0.1:9000
-  accessKey: minioAdmin
-  secretKey: wzw123!@#
+  endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
+  accessKey: ${MINIO_ACCESS_KEY:minioAdmin}
+  secretKey: ${MINIO_SECRET_KEY:wzw123!@#}
   bucketName: origin

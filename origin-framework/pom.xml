@@ -20,6 +20,8 @@
     <modules>
         <!-- 通用工具组件 -->
         <module>origin-common</module>
+        <!-- JWT 认证组件 -->
+        <module>origin-jwt-spring-boot-starter</module>
         <!-- Jackson 序列化组件 -->
         <module>origin-jackson-spring-boot-starter</module>
         <!-- 接口日志组件 -->

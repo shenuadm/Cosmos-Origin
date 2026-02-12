@@ -10,7 +10,6 @@ import com.cosmos.origin.admin.service.LoginLogService;
 import com.cosmos.origin.admin.service.UserSessionService;
 import com.cosmos.origin.admin.utils.IpLocationUtil;
 import com.cosmos.origin.jwt.config.JwtAuthenticationSecurityConfig;
-import com.cosmos.origin.jwt.filter.RateLimitFilter;
 import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationEntryPoint;
@@ -115,8 +114,7 @@ public class WebSecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           TokenAuthenticationFilter tokenAuthenticationFilter,
-                                           RateLimitFilter rateLimitFilter) throws Exception {
+                                           TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
 
@@ -273,11 +271,4 @@ public class WebSecurityConfig {
         return new TokenAuthenticationFilter();
     }
 
-    /**
-     * 限流过滤器
-     */
-    @Bean
-    public RateLimitFilter rateLimitFilter() {
-        return new RateLimitFilter();
-    }
 }

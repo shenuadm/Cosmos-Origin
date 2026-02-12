@@ -1,6 +1,47 @@
 ## 项目概述
 
-origin-springboot 是一个技术底座单体版项目，采用 Spring Boot 3.5.10 + PostgreSQL + JWT + MyBatis Flex 技术栈构建。项目主要功能包括用户登录、角色管理、用户管理、操作日志等模块。
+origin-springboot 是一个技术底座单体版项目，采用 Spring Boot 3.5.10 + PostgreSQL + JWT + MyBatis Flex 技术栈构建。项目主要功能包括用户登录、角色管理、用户管理、评论管理、操作日志等模块。
+
+## 快速开始
+
+### 环境要求
+
+- JDK 17+
+- Maven 3.6+
+- PostgreSQL 12+
+- Redis 6+ (可选，用于登录限流)
+
+### 启动步骤
+
+1. **克隆项目**
+   ```bash
+   git clone <项目地址>
+   cd origin-springboot
+   ```
+
+2. **初始化数据库**
+   ```bash
+   # 创建数据库并执行初始化脚本
+   psql -U postgres -f docs/sql/origin.sql
+   ```
+
+3. **配置环境变量（可选）**
+   ```bash
+   # 开发环境使用默认值即可，生产环境建议配置
+   set DB_PASSWORD=your-password
+   set JWT_SECRET=your-secret-key
+   ```
+
+4. **编译运行**
+   ```bash
+   mvn clean install -DskipTests
+   cd origin-web
+   mvn spring-boot:run
+   ```
+
+5. **访问应用**
+   - 应用地址: http://localhost:8081
+   - API 文档: http://localhost:8081/doc.html
 
 ## 项目架构
 
@@ -11,18 +52,24 @@ origin-springboot 是一个技术底座单体版项目，采用 Spring Boot 3.5.
 ```
 origin-springboot (父工程)
 ├── origin-framework (基础框架层)
-│   ├── origin-common (通用工具组件，Starter)
+│   ├── origin-common (通用工具组件)
+│   ├── origin-jwt-spring-boot-starter (JWT认证组件，Starter)
+│   ├── origin-jackson-spring-boot-starter (Jackson序列化组件，Starter)
 │   ├── origin-event-spring-boot-starter (事件驱动组件，Starter)
 │   ├── origin-operationlog-spring-boot-starter (操作日志组件，Starter)
 │   ├── origin-oss-spring-boot-starter (对象存储组件，Starter)
 │   ├── origin-scheduler-spring-boot-starter (定时任务组件，Starter)
 │   ├── origin-websocket-spring-boot-starter (WebSocket组件，Starter)
-│   └── origin-spring-cloud-starter (微服务治理组件，预留)
-├── origin-jwt (JWT 认证组件，Starter)
+│   ├── origin-redis-spring-boot-starter (Redis缓存组件，Starter)
+│   ├── origin-gateway-spring-boot-starter (API网关组件，Starter)
+│   └── origin-spring-cloud-starter (微服务治理组件，Starter)
 ├── origin-auth (认证服务模块)
 ├── origin-admin (管理后台聚合模块)
 │   ├── origin-admin-api (管理后台接口层，包含 VO、Enums、API)
 │   └── origin-admin-biz (管理后台业务实现)
+├── origin-comment (评论模块聚合)
+│   ├── origin-comment-api (评论接口层，包含 VO、Enums、API)
+│   └── origin-comment-biz (评论业务实现)
 ├── origin-web (单体运行入口，唯一的启动模块)
 └── origin-example (示例代码模块)
 ```
@@ -138,7 +185,7 @@ mvn compile
 |------|------|
 | Spring Boot | 3.5.10 |
 | Java | 17 |
-| Spring Cloud | 2024.0.0 |
+| Spring Cloud | 2025.0.0 |
 | Spring AI | 1.1.1 |
 | MyBatis Flex | 1.11.5 |
 | PostgreSQL | 42.7.8 |
@@ -156,6 +203,7 @@ mvn compile
 - ORM 框架使用 MyBatis Flex 1.11.5
 - 数据库初始化脚本位于 `docs/sql/origin.sql`
 - 数据库连接配置在 `application-dev.yml` 中
+- 支持通过环境变量覆盖配置，详见 [环境变量配置](#环境变量配置)
 
 ### 安全相关
 
@@ -179,3 +227,59 @@ mvn compile
 - 在 Controller 方法上添加 `@ApiOperationLog(description = "功能描述")` 自动记录 API 请求日志
 - 日志会自动记录：请求入参、出参、耗时、请求类、请求方法
 - 每个请求分配唯一 traceId 用于链路追踪
+
+## 环境变量配置
+
+项目支持通过环境变量配置敏感信息，优先级高于配置文件中的默认值。
+
+### 数据库配置
+
+| 环境变量 | 说明 | 默认值 (dev) |
+|----------|------|--------------|
+| `DB_URL` | 数据库连接URL | `jdbc:postgresql://127.0.0.1:5432/origin?serverTimezone=Asia/Shanghai` |
+| `DB_USERNAME` | 数据库用户名 | `root` |
+| `DB_PASSWORD` | 数据库密码 | `wzw123!@#` (dev) / 必填 (prod) |
+
+### Redis 配置
+
+| 环境变量 | 说明 | 默认值 |
+|----------|------|--------|
+| `REDIS_HOST` | Redis 主机地址 | `127.0.0.1` |
+| `REDIS_PORT` | Redis 端口 | `6379` |
+| `REDIS_PASSWORD` | Redis 密码 | `wzw123!@#` (dev) / 必填 (prod) |
+
+### MinIO 配置
+
+| 环境变量 | 说明 | 默认值 (dev) |
+|----------|------|--------------|
+| `MINIO_ENDPOINT` | MinIO 服务端点 | `http://127.0.0.1:9000` |
+| `MINIO_ACCESS_KEY` | 访问密钥 | `minioAdmin` |
+| `MINIO_SECRET_KEY` | 秘密密钥 | `wzw123!@#` (dev) / 必填 (prod) |
+
+### JWT 配置
+
+| 环境变量 | 说明 | 默认值 |
+|----------|------|--------|
+| `JWT_SECRET` | JWT 签名密钥 | 配置文件中的默认值（建议生产环境必配） |
+
+### 配置示例
+
+**Windows:**
+```cmd
+set DB_PASSWORD=mypassword
+set JWT_SECRET=my-secret-key
+set REDIS_PASSWORD=my-redis-password
+```
+
+**Linux/Mac:**
+```bash
+export DB_PASSWORD=mypassword
+export JWT_SECRET=my-secret-key
+export REDIS_PASSWORD=my-redis-password
+```
+
+**IDEA 中配置:**
+在 Run Configuration 的 Environment variables 中添加：
+```
+DB_PASSWORD=mypassword;JWT_SECRET=my-secret-key
+```

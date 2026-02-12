@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author cosmos
  */
 @AutoConfiguration
+@ComponentScan(basePackages = "com.cosmos.origin.gateway")
 @EnableConfigurationProperties(GatewayProperties.class)
 public class GatewayAutoConfiguration {
 
