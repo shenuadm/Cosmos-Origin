@@ -16,7 +16,7 @@ logging:
 # ===========================================
 spring:
   application:
-    name: "技术底座"
+    name: "技术底座单体版"
   profiles:
     # 默认激活的环境
     active: dev
@@ -25,6 +25,10 @@ spring:
       microservice:
         - microservice
         - dev
+  autoconfigure:
+    exclude:
+      # 排除Spring Cloud Gateway的Redis限流自动配置（单体模式下不使用）
+      - org.springframework.cloud.gateway.config.GatewayRedisAutoConfiguration
   cloud:
     gateway:
       # 单体模式下禁用Spring Cloud Gateway
@@ -153,6 +157,7 @@ springdoc:
         - com.cosmos.origin.comment.controller
         - com.cosmos.origin.websocket.controller
         - com.cosmos.origin.oss.controller
+        - com.cosmos.origin.auth.controller
 
 # ===========================================
 # 评论功能配置

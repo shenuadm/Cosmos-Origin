@@ -7,23 +7,29 @@ import com.mybatisflex.annotation.Table;
 import lombok.*;
 
 /**
- * 用户角色关联 实体类
+ * 角色权限关联实体类
  *
  * @author 一陌千尘
- * @date 2025/11/05
+ * @date 2026/02/13
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table("t_user_role_rel")
-public class UserRoleRelDO extends BaseEntity {
+@Table("t_role_permission_rel")
+public class RolePermissionRelDO extends BaseEntity {
 
     @Id(keyType = KeyType.Auto)
     private Long id;
 
-    private Long userId;
-
+    /**
+     * 角色ID
+     */
     private Long roleId;
+
+    /**
+     * 权限ID
+     */
+    private Long permissionId;
 }

@@ -1,5 +1,8 @@
 package com.cosmos.origin.common.utils;
 
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -37,5 +40,31 @@ public class RequestUtil {
             ip = ip.split(",")[0].trim();
         }
         return ip;
+    }
+
+    /**
+     * 获取浏览器名称
+     */
+    public static String getBrowser(HttpServletRequest request) {
+        String userAgentStr = request.getHeader("User-Agent");
+        if (userAgentStr != null) {
+            UserAgent userAgent = UserAgent.parseUserAgentString(userAgentStr);
+            Browser browser = userAgent.getBrowser();
+            return browser.getName();
+        }
+        return "Unknown";
+    }
+
+    /**
+     * 获取操作系统名称
+     */
+    public static String getOperatingSystem(HttpServletRequest request) {
+        String userAgentStr = request.getHeader("User-Agent");
+        if (userAgentStr != null) {
+            UserAgent userAgent = UserAgent.parseUserAgentString(userAgentStr);
+            OperatingSystem os = userAgent.getOperatingSystem();
+            return os.getName();
+        }
+        return "Unknown";
     }
 }

@@ -32,6 +32,7 @@ public enum ResponseCodeEnum implements BaseExceptionInterface {
     COMMENT_WAIT_EXAMINE("20010", "评论已提交, 等待博主审核通过"),
     COMMENT_NOT_FOUND("20011", "该评论不存在"),
     COMMENT_STATUS_NOT_WAIT_EXAMINE("20012", "该评论未处于待审核状态"),
+    VERIFICATION_CODE_SEND_FREQUENTLY("20013", "请求太频繁，请3分钟后再试"),
     ;
 
     // 异常码

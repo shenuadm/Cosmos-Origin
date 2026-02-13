@@ -6,72 +6,60 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 /**
- * 用户实体类
+ * 权限实体类
  *
  * @author 一陌千尘
- * @date 2025/11/03
+ * @date 2026/02/13
  */
 @EqualsAndHashCode(callSuper = true) // 告诉 JVM 不需要生成 equals() 和 hashCode() 方法，直接使用父类的实现
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table("t_user")
-public class UserDO extends BaseEntity {
+@Table("t_perseion")
+public class PermissionDO extends BaseEntity {
 
     @Id(keyType = KeyType.Auto)
     private Long id;
 
     /**
-     * 登录账号
+     * 父 ID
      */
-    private String username;
+    private Long parentId;
 
     /**
-     * 密码
+     * 权限名称
      */
-    private String password;
+    private String name;
 
     /**
-     * 昵称
+     * 类型（1-目录 2-菜单 3-按钮）
      */
-    private String nickname;
+    private Byte type;
 
     /**
-     * 头像
+     * 菜单路由
      */
-    private String avatar;
+    private String menuUrl;
 
     /**
-     * 出生日期
+     * 菜单图标
      */
-    private LocalDateTime birthday;
+    private String menuIcon;
 
     /**
-     * 手机号
+     * 排序
      */
-    private String phone;
+    private Integer sort;
 
     /**
-     * 邮箱
+     * 权限标识
      */
-    private String email;
-
-    /**
-     * 性别（0-女 1-男）
-     */
-    private Byte sex;
+    private String permissionKey;
 
     /**
      * 状态（0-启用 1-禁用）
      */
-    private Integer status;
-
-    /**
-     * 个人简介
-     */
-    private String introduction;
+    private Byte status;
 }

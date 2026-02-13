@@ -14,7 +14,7 @@ import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationEntryPoint;
 import com.cosmos.origin.jwt.handler.RestAuthenticationSuccessHandler;
-import com.cosmos.origin.jwt.utils.RequestUtil;
+import com.cosmos.origin.common.utils.RequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

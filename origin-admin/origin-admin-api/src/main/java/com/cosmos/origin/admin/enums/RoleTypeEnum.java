@@ -12,7 +12,6 @@ import lombok.Getter;
 public enum RoleTypeEnum {
 
     SYSTEM_ADMIN("ROLE_SYSTEM_ADMIN", "系统管理员"),
-    VISITOR("ROLE_VISITOR", "演示用户"),
     ;
 
     private final String roleKey;

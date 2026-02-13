@@ -1,33 +1,51 @@
 package com.cosmos.origin.redis.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 /**
  * Redis 自动配置类
- * 提供 RedisTemplate 和 RedissonClient 配置
- * 在 RedissonAutoConfiguration 之前执行，确保我们先创建 RedisTemplate
+ * 提供 RedisConnectionFactory 和 RedisTemplate 配置
  *
  * @author cosmos
  */
 @AutoConfiguration
-@AutoConfigureBefore(name = "org.redisson.spring.starter.RedissonAutoConfiguration")
 @EnableConfigurationProperties(RedisProperties.class)
-public class RedisAutoConfiguration {
+public class OriginRedisAutoConfiguration {
+
+    /**
+     * 配置 RedisConnectionFactory
+     * 使用 Lettuce 客户端
+     */
+    @Bean
+    @ConditionalOnMissingBean(RedisConnectionFactory.class)
+    public RedisConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+        configuration.setHostName(redisProperties.getHost());
+        configuration.setPort(redisProperties.getPort());
+        configuration.setDatabase(redisProperties.getDatabase());
+        if (redisProperties.getPassword() != null) {
+            configuration.setPassword(redisProperties.getPassword());
+        }
+
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+                .commandTimeout(redisProperties.getTimeout())
+                .build();
+
+        return new LettuceConnectionFactory(configuration, clientConfig);
+    }
 
     /**
      * 配置 RedisTemplate
