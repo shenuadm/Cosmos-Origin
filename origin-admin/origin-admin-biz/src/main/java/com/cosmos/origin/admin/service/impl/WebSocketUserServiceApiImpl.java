@@ -1,4 +1,4 @@
-package com.cosmos.origin.admin.service;
+package com.cosmos.origin.admin.service.impl;
 
 import com.cosmos.origin.admin.domain.dos.UserDO;
 import com.cosmos.origin.admin.domain.mapper.UserMapper;

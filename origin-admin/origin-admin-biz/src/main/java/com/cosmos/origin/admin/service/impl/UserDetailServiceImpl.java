@@ -1,4 +1,4 @@
-package com.cosmos.origin.admin.service;
+package com.cosmos.origin.admin.service.impl;
 
 import com.cosmos.origin.admin.domain.dos.RoleDO;
 import com.cosmos.origin.admin.domain.dos.UserDO;
