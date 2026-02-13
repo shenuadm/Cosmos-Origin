@@ -28,7 +28,9 @@ spring:
   cloud:
     gateway:
       # 单体模式下禁用Spring Cloud Gateway
-      enabled: false
+      server:
+        webflux:
+          enabled: false
     nacos:
       config:
         # 禁用 Nacos 配置导入检查（单体应用暂不使用配置中心）

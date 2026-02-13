@@ -13,9 +13,8 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -31,75 +30,25 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisAutoConfiguration {
 
     /**
-     * 配置 RedisConnectionFactory
-     * 使用 Lettuce 客户端
-     */
-    @Bean
-    @ConditionalOnMissingBean(RedisConnectionFactory.class)
-    public RedisConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
-        LettuceConnectionFactory factory = new LettuceConnectionFactory();
-        factory.setHostName(redisProperties.getHost());
-        factory.setPort(redisProperties.getPort());
-        factory.setDatabase(redisProperties.getDatabase());
-        if (redisProperties.getPassword() != null) {
-            factory.setPassword(redisProperties.getPassword());
-        }
-        return factory;
-    }
-
-    /**
      * 配置 RedisTemplate
      */
     @Bean(name = "redisTemplate")
     @ConditionalOnMissingBean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        // 设置 RedisTemplate 的连接工厂
+        redisTemplate.setConnectionFactory(connectionFactory);
 
-        // 使用 String 序列化方式序列化 key
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        template.setKeySerializer(stringRedisSerializer);
-        template.setHashKeySerializer(stringRedisSerializer);
+        // 使用 StringRedisSerializer 来序列化和反序列化 redis 的 key 值，确保 key 是可读的字符串
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 
-        // 使用 JSON 序列化方式序列化 value
-        GenericJackson2JsonRedisSerializer jsonRedisSerializer = new GenericJackson2JsonRedisSerializer(redisObjectMapper());
-        template.setValueSerializer(jsonRedisSerializer);
-        template.setHashValueSerializer(jsonRedisSerializer);
+        // 使用 Jackson2JsonRedisSerializer 来序列化和反序列化 redis 的 value 值, 确保存储的是 JSON 格式
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
 
-        template.afterPropertiesSet();
-        return template;
-    }
-
-    /**
-     * 配置 RedissonClient 分布式锁
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public RedissonClient redissonClient(RedisProperties redisProperties) {
-        Config config = new Config();
-        String redisUrl = String.format("redis://%s:%d", redisProperties.getHost(), redisProperties.getPort());
-        
-        config.useSingleServer()
-                .setAddress(redisUrl)
-                .setDatabase(redisProperties.getDatabase());
-        
-        if (redisProperties.getPassword() != null) {
-            config.useSingleServer().setPassword(redisProperties.getPassword());
-        }
-        
-        return Redisson.create(config);
-    }
-
-    /**
-     * 为 Redis 序列化定制的 ObjectMapper
-     */
-    private ObjectMapper redisObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-        );
-        return mapper;
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
     }
 }
