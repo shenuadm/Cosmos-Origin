@@ -1,5 +1,6 @@
 package com.cosmos.origin.jwt.filter;
 
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.jwt.utils.JwtTokenHelper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -48,7 +49,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        if ("/login".equals(request.getRequestURI()) && "POST".equalsIgnoreCase(request.getMethod())) {
+        if (JwtSecurityConstants.DEFAULT_LOGIN_URL.equals(request.getRequestURI()) && "POST".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }

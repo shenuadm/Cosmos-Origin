@@ -1,5 +1,6 @@
 package com.cosmos.origin.jwt.filter;
 
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.jwt.exception.UsernameOrPasswordNullException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,16 @@ import java.util.function.Function;
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     /**
+     * 指定登录URL的构造器
+     *
+     * @param loginProcessingUrl 登录处理URL
+     */
+    public JwtAuthenticationFilter(String loginProcessingUrl) {
+        super(createLoginMatcher(loginProcessingUrl));
+        this.loginProcessingUrl = loginProcessingUrl;
+    }
+
+    /**
      * 登录URL，默认 /login
      */
     @Getter
@@ -43,37 +54,27 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
      */
     @Getter
     @Setter
-    private String usernameParameter = "username";
+    private String usernameParameter = JwtSecurityConstants.USERNAME_PARAMETER;
 
     /**
      * 密码字段名，默认 password
      */
     @Getter
     @Setter
-    private String passwordParameter = "password";
+    private String passwordParameter = JwtSecurityConstants.PASSWORD_PARAMETER;
 
     /**
      * 记住我字段名，默认 rememberMe
      */
     @Getter
     @Setter
-    private String rememberMeParameter = "rememberMe";
+    private String rememberMeParameter = JwtSecurityConstants.REMEMBER_ME_PARAMETER;
 
     /**
      * 账号锁定检查函数（在密码验证前执行）
      */
     @Setter
     private Function<String, Void> lockCheckFunction;
-
-    /**
-     * 指定登录URL的构造器
-     *
-     * @param loginProcessingUrl 登录处理URL
-     */
-    public JwtAuthenticationFilter(String loginProcessingUrl) {
-        super(createLoginMatcher(loginProcessingUrl));
-        this.loginProcessingUrl = loginProcessingUrl;
-    }
 
     /**
      * 创建登录请求匹配器
@@ -116,12 +117,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         String password = passwordNode.textValue();
 
         // 将用户名保存到请求属性中，供失败处理器使用
-        request.setAttribute("LOGIN_USERNAME", username);
+        request.setAttribute(JwtSecurityConstants.LOGIN_USERNAME_ATTRIBUTE, username);
 
         // 获取记住我参数并保存到请求属性中
         JsonNode rememberMeNode = jsonNode.get(rememberMeParameter);
         boolean rememberMe = rememberMeNode != null && rememberMeNode.asBoolean(false);
-        request.setAttribute("REMEMBER_ME", rememberMe);
+        request.setAttribute(JwtSecurityConstants.REMEMBER_ME_ATTRIBUTE, rememberMe);
 
         // 在密码验证前检查账号是否被锁定
         if (lockCheckFunction != null) {

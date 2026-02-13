@@ -121,10 +121,9 @@ origin:
       default-limit: 100                    # 默认限流阈值（每秒请求数）
       time-window: 1                        # 限流时间窗口（秒）
       limit-message: "请求过于频繁，请稍后再试"   # 限流提示信息
-      path-limits: # 特定接口限流配置
-        /api/user/login: 10                 # 登录接口限流 10/s
-        /api/user/register: 10              # 注册接口限流 10/s
-        /api/order/create: 20               # 下单接口限流 20/s
+      # path-limits: # 特定接口限流配置
+      #   /login: 10                      # 登录接口限流 10/s
+      #   /register: 10                   # 注册接口限流 10/s
     white-list: # 白名单路径
       - /health
       - /public

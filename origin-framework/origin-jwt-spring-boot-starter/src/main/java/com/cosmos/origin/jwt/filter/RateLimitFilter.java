@@ -1,5 +1,6 @@
 package com.cosmos.origin.jwt.filter;
 
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     // 白名单路径（支持 Ant 风格通配符）
     private static final List<String> WHITE_LIST = Arrays.asList(
-            "/login",
+            JwtSecurityConstants.DEFAULT_LOGIN_URL,
             "/logout",
             "/doc.html",
             "/v3/api-docs/**",

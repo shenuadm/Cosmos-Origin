@@ -1,6 +1,7 @@
 package com.cosmos.origin.jwt.handler;
 
 import com.cosmos.origin.common.utils.Response;
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.jwt.model.LoginRspVO;
 import com.cosmos.origin.jwt.utils.JwtTokenHelper;
 import com.cosmos.origin.jwt.utils.ResultUtil;
@@ -61,7 +62,7 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
         String username = userDetails.getUsername();
 
         // 检查是否勾选了"记住我"
-        Boolean rememberMe = (Boolean) request.getAttribute("REMEMBER_ME");
+        Boolean rememberMe = (Boolean) request.getAttribute(JwtSecurityConstants.REMEMBER_ME_ATTRIBUTE);
         String token;
         Long expireMinutes;
         if (Boolean.TRUE.equals(rememberMe)) {
@@ -76,7 +77,7 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         // 保存 token 到请求属性，供回调使用
         request.setAttribute("LOGIN_TOKEN", token);
-        request.setAttribute("TOKEN_EXPIRE_MINUTES", expireMinutes);
+        request.setAttribute(JwtSecurityConstants.TOKEN_EXPIRE_MINUTES_ATTRIBUTE, expireMinutes);
 
         // 调用会话保存回调
         if (sessionSaveCallback != null) {

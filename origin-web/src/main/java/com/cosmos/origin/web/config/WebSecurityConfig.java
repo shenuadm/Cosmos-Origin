@@ -10,6 +10,7 @@ import com.cosmos.origin.admin.service.LoginLogService;
 import com.cosmos.origin.admin.service.UserSessionService;
 import com.cosmos.origin.admin.utils.IpLocationUtil;
 import com.cosmos.origin.jwt.config.JwtAuthenticationSecurityConfig;
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.jwt.filter.TokenAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAccessDeniedHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationEntryPoint;
@@ -66,10 +67,10 @@ public class WebSecurityConfig {
     public void configureSuccessHandler(RestAuthenticationSuccessHandler successHandler) {
         successHandler.setSessionSaveCallback((request, token) -> {
             try {
-                String username = (String) request.getAttribute("LOGIN_USERNAME");
-                Long expireMinutes = (Long) request.getAttribute("TOKEN_EXPIRE_MINUTES");
-                Boolean rememberMe = (Boolean) request.getAttribute("REMEMBER_ME");
-                String rolesStr = (String) request.getAttribute("USER_ROLES");
+                String username = (String) request.getAttribute(JwtSecurityConstants.LOGIN_USERNAME_ATTRIBUTE);
+                Long expireMinutes = (Long) request.getAttribute(JwtSecurityConstants.TOKEN_EXPIRE_MINUTES_ATTRIBUTE);
+                Boolean rememberMe = (Boolean) request.getAttribute(JwtSecurityConstants.REMEMBER_ME_ATTRIBUTE);
+                String rolesStr = (String) request.getAttribute(JwtSecurityConstants.USER_ROLES_ATTRIBUTE);
 
                 log.debug("准备保存会话 - 用户名: {}, 角色字符串: {}", username, rolesStr);
 
@@ -127,7 +128,7 @@ public class WebSecurityConfig {
                 // ============================================
                 .with(jwtAuthenticationSecurityConfig, customizer -> {
                     // 1. 修改登录 URL 和参数名（可选）
-                    // customizer.setLoginProcessingUrl("/api/auth/login");
+                    // customizer.setLoginProcessingUrl(JwtSecurityConstants.DEFAULT_LOGIN_URL);
                     // customizer.setUsernameParameter("email");
                     // customizer.setPasswordParameter("passwd");
 
@@ -149,7 +150,7 @@ public class WebSecurityConfig {
                                 .map(GrantedAuthority::getAuthority)
                                 .reduce((a, b) -> a + "," + b)
                                 .orElse("");
-                        request.setAttribute("USER_ROLES", roles);
+                        request.setAttribute(JwtSecurityConstants.USER_ROLES_ATTRIBUTE, roles);
 
                         if (loginLogService != null) {
                             loginLogService.recordLoginLog(username, LoginStatusEnum.SUCCESS, "登录成功", request);
@@ -176,7 +177,7 @@ public class WebSecurityConfig {
 
                             // 获取尝试信息并保存到 request，供失败处理器使用
                             Map<String, Object> attemptInfoMap = loginAttemptService.getAttemptInfoAfterFailure(username);
-                            request.setAttribute("LOGIN_ATTEMPT_INFO_MAP", attemptInfoMap);
+                            request.setAttribute(JwtSecurityConstants.LOGIN_ATTEMPT_INFO_MAP_ATTRIBUTE, attemptInfoMap);
                         }
 
                         // 记录失败日志
@@ -205,7 +206,7 @@ public class WebSecurityConfig {
 
                 .authorizeHttpRequests(authorize -> {
                     // 放开登录相关接口
-                    authorize.requestMatchers("/login", "/logout", "/test").permitAll();
+                    authorize.requestMatchers(JwtSecurityConstants.DEFAULT_LOGIN_URL, "/logout", "/test").permitAll();
                     // Knife4j 接口文档
                     authorize.requestMatchers("/doc.html", "/v3/api-docs/**", "/favicon.ico", "/webjars/**", "/.well-known/**").permitAll();
                     // websocket 接口
@@ -232,7 +233,7 @@ public class WebSecurityConfig {
      * 从请求中获取用户名
      */
     private String getUsernameFromRequest(HttpServletRequest request) {
-        String username = (String) request.getAttribute("LOGIN_USERNAME");
+        String username = (String) request.getAttribute(JwtSecurityConstants.LOGIN_USERNAME_ATTRIBUTE);
         return username != null ? username : "unknown";
     }
 

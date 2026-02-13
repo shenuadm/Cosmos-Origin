@@ -42,9 +42,9 @@ origin:
       enabled: true
       default-limit: 200              # 开发环境放宽到 200/s
       time-window: 1
-      path-limits:
-        /api/user/login: 20           # 开发环境 20/s
-        /api/user/register: 20
+      # path-limits:
+      #   /login: 20                # 登录接口限流 20/s
+      #   /register: 20             # 注册接口限流 20/s
 
 #=================================================================
 # minio

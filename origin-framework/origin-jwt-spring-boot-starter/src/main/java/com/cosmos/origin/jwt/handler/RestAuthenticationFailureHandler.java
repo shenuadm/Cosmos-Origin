@@ -3,6 +3,7 @@ package com.cosmos.origin.jwt.handler;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
 import com.cosmos.origin.common.exception.BizException;
 import com.cosmos.origin.common.utils.Response;
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.jwt.exception.UsernameOrPasswordNullException;
 import com.cosmos.origin.jwt.utils.LoginResponseUtil;
 import com.cosmos.origin.jwt.utils.ResultUtil;
@@ -38,7 +39,7 @@ public class RestAuthenticationFailureHandler implements AuthenticationFailureHa
 
         // 获取登录尝试信息（由 onLoginFailure 回调设置）
         @SuppressWarnings("unchecked")
-        Map<String, Object> attemptInfoMap = (Map<String, Object>) request.getAttribute("LOGIN_ATTEMPT_INFO_MAP");
+        Map<String, Object> attemptInfoMap = (Map<String, Object>) request.getAttribute(JwtSecurityConstants.LOGIN_ATTEMPT_INFO_MAP_ATTRIBUTE);
 
         if (exception instanceof UsernameOrPasswordNullException) {
             // 用户名或密码为空

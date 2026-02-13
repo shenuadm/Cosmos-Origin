@@ -1,6 +1,7 @@
 package com.cosmos.origin.web.filter;
 
 import com.cosmos.origin.admin.enums.LoginStatusEnum;
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.admin.service.LoginAttemptService;
 import com.cosmos.origin.admin.service.LoginLogService;
 import com.cosmos.origin.common.enums.ResponseCodeEnum;
@@ -100,9 +101,7 @@ public class LoginAttemptCheckFilter extends OncePerRequestFilter {
      */
     private boolean isLoginRequest(HttpServletRequest request) {
         return "POST".equalsIgnoreCase(request.getMethod()) &&
-                ("/login".equals(request.getServletPath()) ||
-                        "/api/auth/login".equals(request.getServletPath()) ||
-                        "/api/v1/login".equals(request.getServletPath()));
+                JwtSecurityConstants.DEFAULT_LOGIN_URL.equals(request.getServletPath());
     }
 
     /**
@@ -110,12 +109,12 @@ public class LoginAttemptCheckFilter extends OncePerRequestFilter {
      */
     private String extractUsername(HttpServletRequest request) {
         // 优先从请求属性中获取（如果前面的过滤器已经设置）
-        String username = (String) request.getAttribute("LOGIN_USERNAME");
+        String username = (String) request.getAttribute(JwtSecurityConstants.LOGIN_USERNAME_ATTRIBUTE);
         if (username != null) {
             return username;
         }
 
         // 否则从请求参数中获取
-        return request.getParameter("username");
+        return request.getParameter(JwtSecurityConstants.USERNAME_PARAMETER);
     }
 }

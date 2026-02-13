@@ -1,5 +1,6 @@
 package com.cosmos.origin.jwt.config;
 
+import com.cosmos.origin.jwt.constant.JwtSecurityConstants;
 import com.cosmos.origin.jwt.filter.JwtAuthenticationFilter;
 import com.cosmos.origin.jwt.handler.RestAuthenticationFailureHandler;
 import com.cosmos.origin.jwt.handler.RestAuthenticationSuccessHandler;
@@ -57,25 +58,6 @@ public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<D
     // ========== 可配置属性（通过 customizer 设置） ==========
 
     /**
-     * 登录处理URL，默认 /login
-     */
-    @Setter
-    @Getter
-    private String loginProcessingUrl = "/login";
-
-    /**
-     * 用户名字段名，默认 username
-     */
-    @Setter
-    private String usernameParameter = "username";
-
-    /**
-     * 密码字段名，默认 password
-     */
-    @Setter
-    private String passwordParameter = "password";
-
-    /**
      * 自定义成功处理器（覆盖默认的）
      */
     @Setter
@@ -129,9 +111,7 @@ public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<D
     @Override
     public void configure(HttpSecurity httpSecurity) {
         // 创建过滤器并设置自定义URL和参数名
-        this.filter = new JwtAuthenticationFilter(loginProcessingUrl);
-        filter.setUsernameParameter(usernameParameter);
-        filter.setPasswordParameter(passwordParameter);
+        this.filter = new JwtAuthenticationFilter(JwtSecurityConstants.DEFAULT_LOGIN_URL);
         filter.setAuthenticationManager(httpSecurity.getSharedObject(AuthenticationManager.class));
 
         // 设置账号锁定检查函数
@@ -155,7 +135,7 @@ public class JwtAuthenticationSecurityConfig extends SecurityConfigurerAdapter<D
         httpSecurity.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
         log.debug("JwtAuthenticationFilter 配置完成: url={}, usernameParam={}, passwordParam={}",
-                loginProcessingUrl, usernameParameter, passwordParameter);
+                JwtSecurityConstants.DEFAULT_LOGIN_URL, JwtSecurityConstants.USERNAME_PARAMETER, JwtSecurityConstants.PASSWORD_PARAMETER);
     }
 
     /**
